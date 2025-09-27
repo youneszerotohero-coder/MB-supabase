@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from '@tanstack/react-query';
-import api from "@/services/api";
+import { deleteProduct } from "@/services/productService";
 import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle } from "lucide-react";
 
@@ -24,7 +24,7 @@ export function DeleteProductDialog({ open, onOpenChange, product }) {
     setIsLoading(true);
 
     try {
-      await api.delete(`/products/${product.id}`);
+      await deleteProduct(product.id);
       
       toast({
         title: "Success",
@@ -38,7 +38,7 @@ export function DeleteProductDialog({ open, onOpenChange, product }) {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete product",
+        description: error.message || "Failed to delete product",
         variant: "destructive",
       });
     } finally {

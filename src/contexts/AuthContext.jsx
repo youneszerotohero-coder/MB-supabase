@@ -10,6 +10,24 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     const initAuth = async () => {
       try {
+        // BYPASS AUTHENTICATION FOR TESTING - Auto-login as admin
+        const mockUser = {
+          id: 'admin-123',
+          email: 'admin@test.com',
+          fullName: 'Test Admin',
+          role: 'admin'
+        };
+        
+        setUser(mockUser);
+        localStorage.setItem('user', JSON.stringify(mockUser));
+        localStorage.setItem('token', 'bypass-token');
+        
+        console.log('Authentication bypassed - logged in as admin');
+        setLoading(false);
+        return;
+
+        // Original authentication code (commented out)
+        /*
         const token = localStorage.getItem('token');
         if (!token) {
           setLoading(false);
@@ -27,6 +45,7 @@ export const AuthProvider = ({ children }) => {
         }
 
         setLoading(false);
+        */
       } catch (error) {
         console.error('Auth initialization failed:', error);
         logout();

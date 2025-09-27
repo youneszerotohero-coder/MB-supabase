@@ -19,7 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from "@/services/api";
+import { updateProduct } from "@/services/productService";
+import { getCategories } from "@/services/categoryService";
 import { useToast } from "@/hooks/use-toast";
 import { Image as ImageIcon, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -49,8 +50,8 @@ export function EditProductDialog({ open, onOpenChange, product }) {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await api.get('/categories');
-      return response.data.data?.categories || response.data?.categories || response.data.data || response.data || [];
+      const response = await getCategories();
+      return response.data || [];
     },
     enabled: open
   });
@@ -140,7 +141,7 @@ export function EditProductDialog({ open, onOpenChange, product }) {
     };
 
     try {
-      await api.put(`/products/${product.id}`, productData);
+      await updateProduct(product.id, productData);
       
       toast({
         title: "Success",
@@ -154,7 +155,7 @@ export function EditProductDialog({ open, onOpenChange, product }) {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to update product",
+        description: error.message || "Failed to update product",
         variant: "destructive",
       });
     } finally {

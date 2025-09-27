@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from "@/services/api";
+import { createCategory, getCategories } from "@/services/categoryService";
 import { useToast } from "@/hooks/use-toast";
 
 export function AddCategoryDialog({ open, onOpenChange }) {
@@ -35,8 +35,8 @@ export function AddCategoryDialog({ open, onOpenChange }) {
   const { data: categories } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const res = await api.get('/categories');
-      return res.data.data?.categories || res.data?.categories || res.data.data || res.data;
+      const res = await getCategories();
+      return res.data || [];
     }
   });
 
@@ -45,7 +45,7 @@ export function AddCategoryDialog({ open, onOpenChange }) {
     setIsLoading(true);
 
     try {
-      await api.post('/categories', {
+      await createCategory({
         ...formData,
         slug: formData.name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
       });
@@ -70,7 +70,7 @@ export function AddCategoryDialog({ open, onOpenChange }) {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create category",
+        description: error.message || "Failed to create category",
         variant: "destructive",
       });
     } finally {

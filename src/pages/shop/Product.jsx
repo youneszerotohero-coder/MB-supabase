@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom'
 import { useQuery } from '@tanstack/react-query'
-import api from '@/services/api'
+import { getProductById, getProducts } from '@/services/productService'
+import { createOrder } from '@/services/orderService'
 import { Loader2, CheckCircle, AlertCircle, Check } from "lucide-react";
 import statesData from "../../utils/statesData"
 import ProductCard from '../../components/productCard';
@@ -19,9 +20,9 @@ export default function App() {
   const { data, isLoading, isError, error } = useQuery({
     queryKey: ['product', id],
     queryFn: async () => {
-      const res = await api.get(`/products/${id}`)
+      const res = await getProductById(id)
       console.log('Product API response:', res.data)
-      return res.data.data || res.data
+      return res.data
     },
     enabled: !!id
   })
@@ -34,13 +35,13 @@ export default function App() {
     colors: [],
     sizes: [],
     description: '',
-    descriptionAr: ''
+    description_ar: ''
   }
 
   // Get the appropriate description based on current language
   const getProductDescription = () => {
-    if (currentLanguage === 'ar' && mainProduct.descriptionAr) {
-      return mainProduct.descriptionAr;
+    if (currentLanguage === 'ar' && mainProduct.description_ar) {
+      return mainProduct.description_ar;
     }
     return mainProduct.description || 'This elegant handbag is perfect for any occasion. Made from high-quality materials, it offers both comfort and style. The bag features a flattering silhouette and subtle details that add a touch of sophistication. Available in various colors, it\'s designed to fit and flatter every body type.';
   };
@@ -55,22 +56,20 @@ export default function App() {
 
   // Fetch related products
   const { data: relatedProductsData } = useQuery({
-    queryKey: ['related-products', mainProduct.categoryId],
+    queryKey: ['related-products', mainProduct.category_id],
     queryFn: async () => {
-      const res = await api.get('/products', { 
-        params: { 
-          limit: 4, 
-          sortBy: 'createdAt',
-          sortOrder: 'desc'
-        } 
+      const res = await getProducts({ 
+        limit: 4, 
+        sortBy: 'createdAt',
+        sortOrder: 'desc'
       })
-      return res.data.data
+      return res.data.products
     },
     enabled: !!data
   })
 
-  const relatedProducts = Array.isArray(relatedProductsData?.products) 
-    ? relatedProductsData.products.filter(p => p.id !== id).slice(0, 4)
+  const relatedProducts = Array.isArray(relatedProductsData) 
+    ? relatedProductsData.filter(p => p.id !== id).slice(0, 4)
     : []
 
   const [selectedImage, setSelectedImage] = useState(mainImage);
@@ -192,19 +191,21 @@ export default function App() {
         customerEmail: `${phone}@temp.com`, // Temporary email
         items: [{
           productId: mainProduct.id,
-          quantity: quantity
+          quantity: quantity,
+          unitPrice: productPrice,
+          productName: mainProduct.name
         }],
         deliveryFee: shipping,
         orderSource: 'website',
         notes: `Order from product page - ${mainProduct.name}`
       };
 
-      const response = await api.post('/orders', orderData);
+      const response = await createOrder(orderData);
 
       // Show success notification
       setNotification({
         show: true,
-        message: `${t('common.orderCreated')} ${response.data.data.orderNumber}`,
+        message: `${t('common.orderCreated')} ${response.data.orderNumber}`,
         type: "success"
       });
 
@@ -212,7 +213,7 @@ export default function App() {
       setTimeout(() => {
         navigate('/thankyou', {
           state: {
-            orderId: response.data.data.orderNumber,
+            orderId: response.data.orderNumber,
             productName: mainProduct.name,
             quantity,
             total: total.toFixed(2),

@@ -26,7 +26,8 @@ export function resolveImageUrl(imageUrl, fallback = '/placeholder-product.jpg')
  * @returns {string} The resolved primary image URL
  */
 export function getProductImageUrl(product, fallback = '/placeholder-product.jpg') {
-  const imageUrl = (product.images && product.images[0] && product.images[0].url) || 
+  // Handle the new Supabase structure where images is an array of objects
+  const imageUrl = (product.images && product.images.length > 0 && product.images[0].url) || 
                    product.image || 
                    product.thumbnail;
   return resolveImageUrl(imageUrl, fallback);

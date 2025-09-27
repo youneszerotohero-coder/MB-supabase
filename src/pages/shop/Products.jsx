@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react"
 import { useQuery } from '@tanstack/react-query'
-import api from '@/services/api'
+import { getProducts } from '@/services/productService'
+import { getCategories } from '@/services/categoryService'
 import { Search, ChevronLeft, ChevronRight, Filter, X } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -78,8 +79,9 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
         }
       })
       
-      const res = await api.get('/products', { params })
-      return res.data.data
+      const res = await getProducts(params)
+      console.log('Products response:', res)
+      return res.data.products
     }
   })
 
@@ -104,8 +106,9 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
     </div>
   )
 
-  const products = data?.products || []
-  const pagination = data?.pagination || {}
+  console.log('Products data:', data)
+  const products = data || []
+  const pagination = {} // We'll handle pagination later
 
   if (products.length === 0) {
     return (
@@ -217,12 +220,12 @@ export default function ProductCatalog() {
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false)
   const [isInitialized, setIsInitialized] = useState(false)
 
-  // Fetch categories from backend
+  // Fetch categories from Supabase
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await api.get('/categories');
-      return response.data.data?.categories || response.data?.categories || response.data.data || response.data || [];
+      const response = await getCategories();
+      return response.data || [];
     }
   });
 

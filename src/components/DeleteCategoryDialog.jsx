@@ -9,7 +9,7 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { useQueryClient } from '@tanstack/react-query';
-import api from "@/services/api";
+import { deleteCategory } from "@/services/categoryService";
 import { useToast } from "@/hooks/use-toast";
 import { AlertTriangle } from "lucide-react";
 
@@ -24,7 +24,7 @@ export function DeleteCategoryDialog({ open, onOpenChange, category }) {
     setIsLoading(true);
 
     try {
-      await api.delete(`/categories/${category.id}`);
+      await deleteCategory(category.id);
       
       toast({
         title: "Success",
@@ -39,7 +39,7 @@ export function DeleteCategoryDialog({ open, onOpenChange, category }) {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to delete category",
+        description: error.message || "Failed to delete category",
         variant: "destructive",
       });
     } finally {

@@ -19,7 +19,8 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from "@/services/api";
+import { createProduct } from "@/services/productService";
+import { getCategories } from "@/services/categoryService";
 import { useToast } from "@/hooks/use-toast";
 import { Image as ImageIcon, X } from "lucide-react";
 import { useTranslation } from "react-i18next";
@@ -118,8 +119,8 @@ export function AddProductDialog({ open, onOpenChange }) {
   const { data: categories = [] } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const response = await api.get('/categories');
-      return response.data.data?.categories || response.data?.categories || response.data.data || response.data || [];
+      const response = await getCategories();
+      return response.data || [];
     },
     enabled: open // Only fetch when dialog is open
   });
@@ -175,7 +176,7 @@ export function AddProductDialog({ open, onOpenChange }) {
     };
 
     try {
-      const response = await api.post('/products', productData);
+      const response = await createProduct(productData);
       
       toast({
         title: "Success",
@@ -206,7 +207,7 @@ export function AddProductDialog({ open, onOpenChange }) {
     } catch (error) {
       toast({
         title: "Error",
-        description: error.response?.data?.message || "Failed to create product",
+        description: error.message || "Failed to create product",
         variant: "destructive",
       });
     } finally {

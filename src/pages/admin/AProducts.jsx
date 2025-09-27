@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import api from '@/services/api';
+import { getProducts } from '@/services/productService';
+import { getCategories } from '@/services/categoryService';
 import { Plus, Search, Edit, Trash2, Image as ImageIcon, X, QrCode, RefreshCw } from "lucide-react";
 import { resolveImageUrl } from '@/utils/imageUtils';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -35,8 +36,8 @@ export default function AProducts() {
   const { data: productsData, isLoading } = useQuery({
     queryKey: ['admin_products'],
     queryFn: async () => {
-      const res = await api.get('/products', { params: { page: 1, limit: 50 } });
-      return res.data.data || res.data;
+      const res = await getProducts({ page: 1, limit: 50 });
+      return res.data.products;
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
@@ -45,15 +46,15 @@ export default function AProducts() {
   const { data: categoriesData } = useQuery({
     queryKey: ['categories'],
     queryFn: async () => {
-      const res = await api.get('/categories');
-      return res.data.data?.categories || res.data?.categories || res.data.data || res.data;
+      const res = await getCategories();
+      return res.data || [];
     },
     staleTime: 5 * 60 * 1000, // 5 minutes
     refetchOnWindowFocus: false,
   });
 
   // Transform data for rendering
-  const allProducts = Array.isArray(productsData?.products) ? productsData.products : [];
+  const allProducts = Array.isArray(productsData) ? productsData : [];
   const allCategories = Array.isArray(categoriesData) ? categoriesData : [];
 
   // Filter products based on search term
@@ -62,9 +63,8 @@ export default function AProducts() {
     const term = searchTerm.toLowerCase();
     return (
       product.name?.toLowerCase().includes(term) ||
-      product.brand?.toLowerCase().includes(term) ||
       product.category?.name?.toLowerCase().includes(term) ||
-      product.sku?.toLowerCase().includes(term)
+      product.slug?.toLowerCase().includes(term)
     );
   });
 
@@ -349,7 +349,7 @@ export default function AProducts() {
                             </div>
                             <div>
                               <div className="font-medium text-foreground">{product.name}</div>
-                              <div className="text-sm text-muted-foreground">{product.sku || 'No SKU'}</div>
+                              <div className="text-sm text-muted-foreground">{product.slug || 'No slug'}</div>
                             </div>
                           </div>
                         </td>
@@ -362,8 +362,8 @@ export default function AProducts() {
                           ${((product.price || 0) - (product.cost || 0)).toFixed(2)}
                         </td>
                         <td className="py-4 px-6">
-                          <span className={`font-medium ${product.stockQuantity > 0 ? 'text-foreground' : 'text-destructive'}`}>
-                            {product.stockQuantity || 0}
+                          <span className={`font-medium ${product.stock_quantity > 0 ? 'text-foreground' : 'text-destructive'}`}>
+                            {product.stock_quantity || 0}
                           </span>
                         </td>
                         <td className="py-4 px-6">
@@ -380,12 +380,12 @@ export default function AProducts() {
                           <Badge 
                             variant="secondary" 
                             className={`${
-                              product.isActive 
+                              product.stock_quantity > 0 
                                 ? 'bg-success-light text-success' 
                                 : 'bg-warning-light text-warning'
                             }`}
                           >
-                            {product.isActive ? 'Active' : 'Out of Stock'}
+                            {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
                           </Badge>
                         </td>
                         <td className="py-4 px-6">

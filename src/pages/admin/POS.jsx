@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import api from "@/services/api";
+import { getProducts } from "@/services/productService";
+import { createOrder } from "@/services/orderService";
 import { getProductImageUrl } from "@/utils/imageUtils";
 import { QRScanner } from "../../components/QRScanner";
 
@@ -41,18 +42,18 @@ export default function POS() {
         isActive: true,
         search: searchTerm || undefined
       };
-      const res = await api.get('/products', { params });
-      return res.data.data || res.data;
+      const res = await getProducts(params);
+      return res.data.products;
     },
     staleTime: 2 * 60 * 1000, // 2 minutes (shorter for POS as stock changes frequently)
     refetchOnWindowFocus: false,
   });
 
-  const products = Array.isArray(productsData?.products) ? productsData.products : [];
+  const products = Array.isArray(productsData) ? productsData : [];
 
   const addToCart = (product) => {
     // Check stock availability
-    if (product.stockQuantity <= 0) {
+    if (product.stock_quantity <= 0) {
       toast({
         title: "Out of Stock",
         description: `${product.name} is currently out of stock`,
@@ -65,10 +66,10 @@ export default function POS() {
       const existing = prev.find((item) => item.id === product.id);
       if (existing) {
         // Check if adding one more would exceed stock
-        if (existing.quantity >= product.stockQuantity) {
+        if (existing.quantity >= product.stock_quantity) {
           toast({
             title: "Insufficient Stock",
-            description: `Only ${product.stockQuantity} units available`,
+            description: `Only ${product.stock_quantity} units available`,
             variant: "destructive",
           });
           return prev;
@@ -89,10 +90,10 @@ export default function POS() {
     } else {
       // Find the product to check stock
       const product = products.find(p => p.id === id);
-      if (product && quantity > product.stockQuantity) {
+      if (product && quantity > product.stock_quantity) {
         toast({
           title: "Insufficient Stock",
-          description: `Only ${product.stockQuantity} units available`,
+          description: `Only ${product.stock_quantity} units available`,
           variant: "destructive",
         });
         return;
@@ -152,18 +153,20 @@ export default function POS() {
         customerEmail: customerInfo.email,
         items: cart.map(item => ({
           productId: item.id,
-          quantity: item.quantity
+          quantity: item.quantity,
+          unitPrice: Number(item.price),
+          productName: item.name
         })),
         deliveryFee: 0, // In-store orders have no delivery fee
         orderSource: 'pos',
         notes: 'In-store POS order'
       };
 
-      const response = await api.post('/orders/pos', orderData);
+      const response = await createOrder(orderData);
       
       toast({
         title: "Order Processed Successfully",
-        description: `Order #${response.data.data.orderNumber} created for ${customerInfo.name}`,
+        description: `Order #${response.data.orderNumber} created for ${customerInfo.name}`,
       });
       
       setOrderSuccess(true);
@@ -174,7 +177,7 @@ export default function POS() {
 
       // Dispatch custom event to notify other components
       window.dispatchEvent(new CustomEvent('orderCreated', {
-        detail: { orderId: response.data.data.orderNumber }
+        detail: { orderId: response.data.orderNumber }
       }));
       
     } catch (error) {
@@ -286,21 +289,21 @@ export default function POS() {
                           <Badge 
                             variant="secondary" 
                             className={`ml-2 ${
-                              product.stockQuantity > 10 
+                              product.stock_quantity > 10 
                                 ? 'bg-success-light text-success' 
-                                : product.stockQuantity > 0 
+                                : product.stock_quantity > 0 
                                 ? 'bg-warning-light text-warning' 
                                 : 'bg-destructive-light text-destructive'
                             }`}
                           >
-                            {product.stockQuantity} in stock
+                            {product.stock_quantity} in stock
                           </Badge>
                         </div>
                         <Button
                           onClick={() => addToCart(product)}
                           size="sm"
                           className="bg-primary hover:bg-primary-hover"
-                          disabled={product.stockQuantity <= 0}
+                          disabled={product.stock_quantity <= 0}
                         >
                           <Plus className="w-4 h-4 mr-1" />
                           Add
