@@ -1,0 +1,291 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ===============================
+   Fonts
+   =============================== */
+.epunda-slab {
+  font-family: "Epunda Slab", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+* {
+  font-family: 'Epunda Slab', serif;
+}
+
+html, body, #root {
+  height: 100%;
+}
+
+/* ===============================
+   Base Theme (Light Mode)
+   =============================== */
+@layer base {
+  :root {
+    /* Core Background & Text */
+    --background: 250 50% 98%;
+    --foreground: 220 15% 20%;
+
+    /* Cards & Surfaces */
+    --card: 0 0% 100%;
+    --card-foreground: 220 15% 20%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 220 15% 20%;
+
+    /* Primary Brand Colors */
+    --primary: 220 90% 56%;
+    --primary-foreground: 0 0% 100%;
+    --primary-hover: 220 85% 52%;
+    --primary-light: 220 95% 95%;
+
+    /* Secondary & Accents */
+    --secondary: 210 25% 96%;
+    --secondary-foreground: 220 15% 35%;
+    --accent: 15 90% 95%;
+    --accent-foreground: 15 85% 45%;
+
+    /* Success, Warning, Error */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 100%;
+    --success-light: 142 76% 95%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 100%;
+    --warning-light: 38 90% 95%;
+    
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+    --destructive-light: 0 85% 95%;
+
+    /* Neutral Grays */
+    --muted: 220 15% 96%;
+    --muted-foreground: 220 10% 55%;
+    --border: 220 20% 92%;
+    --input: 220 20% 96%;
+    --ring: 220 90% 56%;
+
+    /* Sidebar Specific */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+
+    /* Dashboard Stats */
+    --dashboard-stats-revenue: 220 90% 56%;
+    --dashboard-stats-orders: 142 76% 36%;
+    --dashboard-stats-stock: 45 90% 55%;
+    --dashboard-stats-profit: 260 75% 65%;
+
+    /* Charts */
+    --chart-1: 12 76% 61%;
+    --chart-2: 173 58% 39%;
+    --chart-3: 197 37% 24%;
+    --chart-4: 43 74% 66%;
+    --chart-5: 27 87% 67%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(142 70% 40%));
+    --gradient-dashboard: linear-gradient(135deg, hsl(var(--background)), hsl(210 30% 96%));
+
+    /* Shadows & Effects */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+    --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.06);
+
+    /* Transitions */
+    --transition-smooth: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+
+    --radius: 0.5rem;
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+
+  /* Dark Mode */
+  .dark {
+    /* Core Background & Text */
+    --background: 240 10% 3.9%;
+    --foreground: 0 0% 98%;
+
+    /* Cards & Surfaces */
+    --card: 240 10% 3.9%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 10% 3.9%;
+    --popover-foreground: 0 0% 98%;
+
+    /* Primary Brand Colors */
+    --primary: 217 91% 60%;
+    --primary-foreground: 0 0% 98%;
+    --primary-hover: 217 91% 55%;
+    --primary-light: 217 91% 15%;
+
+    /* Secondary & Accents */
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 0 0% 98%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 0 0% 98%;
+
+    /* Success, Warning, Error */
+    --success: 142 76% 36%;
+    --success-foreground: 0 0% 98%;
+    --success-light: 142 76% 15%;
+    
+    --warning: 38 92% 50%;
+    --warning-foreground: 0 0% 9%;
+    --warning-light: 38 90% 15%;
+    
+    --destructive: 0 62.8% 50%;
+    --destructive-foreground: 0 0% 98%;
+    --destructive-light: 0 62.8% 15%;
+
+    /* Neutral Grays */
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 217.2 91.2% 59.8%;
+
+    /* Sidebar Specific */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 224.3 76.3% 48%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+
+    /* Dashboard Stats */
+    --dashboard-stats-revenue: 217 91% 60%;
+    --dashboard-stats-orders: 142 76% 50%;
+    --dashboard-stats-stock: 45 90% 55%;
+    --dashboard-stats-profit: 260 75% 65%;
+
+    /* Charts */
+    --chart-1: 220 70% 50%;
+    --chart-2: 160 60% 45%;
+    --chart-3: 30 80% 55%;
+    --chart-4: 280 65% 60%;
+    --chart-5: 340 75% 55%;
+
+    /* Gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-hover)));
+    --gradient-success: linear-gradient(135deg, hsl(var(--success)), hsl(142 70% 40%));
+    --gradient-dashboard: linear-gradient(135deg, hsl(var(--background)), hsl(240 10% 8%));
+
+    /* Shadows & Effects */
+    --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+    --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+    --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.3);
+    --shadow-card: 0 2px 8px 0 rgb(0 0 0 / 0.3);
+
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+/* ===============================
+   Base Styles
+   =============================== */
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans antialiased;
+  }
+}
+
+/* ===============================
+   Component Styles
+   =============================== */
+@layer components {
+  .stats-card {
+    @apply bg-card rounded-lg p-6 border border-border/50 hover:shadow-md transition-all duration-200;
+    box-shadow: var(--shadow-card);
+  }
+  
+  .sidebar-nav-item {
+    @apply flex items-center gap-3 px-4 py-3 rounded-lg text-sidebar-foreground/80 hover:text-sidebar-foreground hover:bg-sidebar-accent transition-all duration-200;
+  }
+  
+  .sidebar-nav-item.active {
+    @apply bg-sidebar-primary text-sidebar-primary-foreground shadow-sm;
+  }
+  
+  .dashboard-gradient {
+    background: var(--gradient-dashboard);
+  }
+  
+  .hover-lift {
+    @apply transition-all duration-200 hover:-translate-y-1 hover:shadow-lg;
+  }
+
+  /* Dashboard stat colors */
+  .text-dashboard-revenue {
+    color: hsl(var(--dashboard-stats-revenue));
+  }
+  
+  .text-dashboard-orders {
+    color: hsl(var(--dashboard-stats-orders));
+  }
+  
+  .text-dashboard-stock {
+    color: hsl(var(--dashboard-stats-stock));
+  }
+
+  .text-dashboard-profit {
+    color: hsl(var(--dashboard-stats-profit));
+  }
+
+  .bg-dashboard-revenue\/10 {
+    background-color: hsl(var(--dashboard-stats-revenue) / 0.1);
+  }
+  
+  .bg-dashboard-orders\/10 {
+    background-color: hsl(var(--dashboard-stats-orders) / 0.1);
+  }
+  
+  .bg-dashboard-stock\/10 {
+    background-color: hsl(var(--dashboard-stats-stock) / 0.1);
+  }
+
+  .bg-dashboard-profit\/10 {
+    background-color: hsl(var(--dashboard-stats-profit) / 0.1);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+@layer utilities {
+  /* Main container */
+  .main-container {
+    @apply w-full;
+  }
+
+  @media (min-width: 1024px) { /* Laptop and up */
+    .main-container {
+      height: calc(100vh - 2rem); /* 2rem = py-8 (top+bottom padding = 2rem) */
+      overflow-y: auto;
+    }
+  }
+
+  /* Cards wrapper for mobile */
+  .cards-mobile {
+    @media (max-width: 1023px) { /* Mobile & tablets only */
+      overflow-x: auto;
+      width: 100%;
+    }
+  }
+}
