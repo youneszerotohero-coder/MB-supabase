@@ -16,10 +16,8 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
     name: '',
     description: '',
     cost: '',
-    budget: '',
     startDate: '',
     endDate: '',
-    campaignType: 'general',
     isActive: true,
     productIds: []
   })
@@ -42,10 +40,8 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
         name: campaign.name || '',
         description: campaign.description || '',
         cost: campaign.cost?.toString() || '',
-        budget: campaign.budget?.toString() || '',
         startDate: campaign.startDate ? new Date(campaign.startDate).toISOString().split('T')[0] : '',
         endDate: campaign.endDate ? new Date(campaign.endDate).toISOString().split('T')[0] : '',
-        campaignType: campaign.campaignType || 'general',
         isActive: campaign.isActive ?? true,
         productIds: campaign.campaignProducts?.map(cp => cp.productId) || []
       })
@@ -61,22 +57,18 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
     try {
       setLoadingProducts(true)
       const response = await getProducts({ limit: 1000 })
-      console.log('Products response:', response) // Debug log
       
-      // Handle different response structures
+      // Extract products from the response structure
       let productsData = []
-      if (response) {
-        if (Array.isArray(response)) {
-          productsData = response
-        } else if (response.data && Array.isArray(response.data)) {
-          productsData = response.data
-        } else if (response.products && Array.isArray(response.products)) {
-          productsData = response.products
-        }
+      if (response && response.data && response.data.products) {
+        productsData = response.data.products
+      } else if (Array.isArray(response)) {
+        productsData = response
+      } else if (response && response.data && Array.isArray(response.data)) {
+        productsData = response.data
       }
       
       setProducts(productsData)
-      console.log('Products loaded:', productsData) // Debug log
     } catch (error) {
       console.error('Error loading products:', error)
       setProducts([]) // Ensure products is always an array
@@ -95,7 +87,11 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
 
   const handleProductSelect = (productId, checked) => {
     const product = products.find(p => p.id === productId)
-    if (!product) return
+    
+    if (!product) {
+      console.error('Product not found:', productId)
+      return
+    }
 
     if (checked) {
       setSelectedProducts(prev => [...prev, product])
@@ -139,9 +135,10 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
       newErrors.cost = 'Cost must be a valid number'
     }
 
-    if (formData.budget && isNaN(parseFloat(formData.budget))) {
-      newErrors.budget = 'Budget must be a valid number'
+    if (formData.productIds.length === 0) {
+      newErrors.productIds = 'Please select at least one product'
     }
+
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -159,7 +156,6 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
       const campaignData = {
         ...formData,
         cost: parseFloat(formData.cost) || 0,
-        budget: formData.budget ? parseFloat(formData.budget) : null,
         startDate: new Date(formData.startDate).toISOString(),
         endDate: formData.endDate ? new Date(formData.endDate).toISOString() : null
       }
@@ -221,39 +217,9 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
             </div>
 
             <div>
-              <Label htmlFor="campaignType">Campaign Type</Label>
-              <Select
-                value={formData.campaignType}
-                onValueChange={(value) => handleInputChange('campaignType', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select campaign type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="general">General Marketing</SelectItem>
-                  <SelectItem value="product_linked">Product-Linked</SelectItem>
-                  <SelectItem value="brand_awareness">Brand Awareness</SelectItem>
-                  <SelectItem value="seasonal">Seasonal</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="flex items-center space-x-2">
-              <Checkbox
-                id="isActive"
-                checked={formData.isActive}
-                onCheckedChange={(checked) => handleInputChange('isActive', checked)}
-              />
-              <Label htmlFor="isActive">Active Campaign</Label>
-            </div>
-          </div>
-
-          {/* Budget and Cost */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
               <Label htmlFor="cost" className="flex items-center gap-2">
                 <DollarSign className="w-4 h-4" />
-                Total Cost
+                Campaign Price *
               </Label>
               <Input
                 id="cost"
@@ -272,26 +238,13 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
               )}
             </div>
 
-            <div>
-              <Label htmlFor="budget" className="flex items-center gap-2">
-                <DollarSign className="w-4 h-4" />
-                Budget (Optional)
-              </Label>
-              <Input
-                id="budget"
-                type="number"
-                step="0.01"
-                value={formData.budget}
-                onChange={(e) => handleInputChange('budget', e.target.value)}
-                placeholder="0.00"
-                className={errors.budget ? 'border-destructive' : ''}
+            <div className="flex items-center space-x-2">
+              <Checkbox
+                id="isActive"
+                checked={formData.isActive}
+                onCheckedChange={(checked) => handleInputChange('isActive', checked)}
               />
-              {errors.budget && (
-                <p className="text-sm text-destructive mt-1 flex items-center gap-1">
-                  <AlertCircle className="w-3 h-3" />
-                  {errors.budget}
-                </p>
-              )}
+              <Label htmlFor="isActive">Active Campaign</Label>
             </div>
           </div>
 
@@ -342,10 +295,10 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
           <div>
             <Label className="flex items-center gap-2">
               <Package className="w-4 h-4" />
-              Link Products (Optional)
+              Select Products *
             </Label>
             <p className="text-sm text-muted-foreground mb-3">
-              Select products to link to this campaign. Cost will be distributed equally among selected products.
+              Select products for this campaign.
             </p>
 
             {/* Selected Products */}
@@ -405,6 +358,12 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
                 </div>
               )}
             </div>
+            {errors.productIds && (
+              <p className="text-sm text-destructive mt-1 flex items-center gap-1">
+                <AlertCircle className="w-3 h-3" />
+                {errors.productIds}
+              </p>
+            )}
           </div>
 
           {/* Submit Error */}

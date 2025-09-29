@@ -14,6 +14,7 @@ import { QRScanner } from "../../components/QRScanner";
 export default function POS() {
   const [cart, setCart] = useState([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderSuccess, setOrderSuccess] = useState(false);
   const [qrScannerOpen, setQrScannerOpen] = useState(false);
@@ -32,14 +33,23 @@ export default function POS() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
+  // Debounce search term
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 300);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
   // Fetch products from API
   const { data: productsData, isLoading: productsLoading } = useQuery({
-    queryKey: ['pos_products', searchTerm],
+    queryKey: ['pos_products', debouncedSearchTerm],
     queryFn: async () => {
       const params = {
         page: 1,
         limit: 100,
-        search: searchTerm || undefined
+        search: debouncedSearchTerm || undefined
       };
       const res = await getProducts(params);
       return res.data.products;
