@@ -39,7 +39,6 @@ export default function POS() {
       const params = {
         page: 1,
         limit: 100,
-        isActive: true,
         search: searchTerm || undefined
       };
       const res = await getProducts(params);

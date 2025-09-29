@@ -9,164 +9,149 @@ datasource db {
 }
 
 model User {
-  id                 String     @id @default(uuid())
-  email              String     @unique
-  passwordHash       String     @map("password_hash")
-  fullName           String     @map("full_name")
-  phone              String?
-  role               UserRole
-  createdAt          DateTime   @default(now()) @map("created_at")
-  updatedAt          DateTime   @updatedAt @map("updated_at")
-  campaigns          Campaign[] 
-  orders             Order[]    @relation("CreatedByUser") 
+  id           String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  email        String     @unique
+  passwordHash String     @map("password_hash")
+  fullName     String     @map("full_name")
+  phone        String?
+  role         user_role
+  createdAt    DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt    DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  campaigns    Campaign[]
+  orders       Order[]    @relation("CreatedByUser")
 
   @@map("users")
 }
 
 model Category {
-  id                String              @id @default(uuid())
-  name              String
-  slug              String              @unique
-  parentId          String?             @map("parent_id")
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  parent            Category?           @relation("CategoryHierarchy", fields: [parentId], references: [id])
-  children          Category[]          @relation("CategoryHierarchy") 
-  products          Product[]
+  id        String     @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  name      String
+  slug      String     @unique
+  parentId  String?    @map("parent_id") @db.Uuid
+  createdAt DateTime?  @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime?  @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
+  parent    Category?  @relation("CategoryHierarchy", fields: [parentId], references: [id], onUpdate: NoAction)
+  children  Category[] @relation("CategoryHierarchy")
+  products  Product[]
 
-  @@index([slug])
-  @@index([parentId])
   @@map("categories")
 }
 
 model Product {
-  id               String                   @id @default(uuid())
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name             String
-  slug             String                   @unique
+  slug             String            @unique
   description      String?
-  descriptionAr    String?                  @map("description_ar")
-  price            Decimal                  @db.Decimal(10, 2)
-  cost             Decimal?                 @db.Decimal(10, 2)
-  compareAtPrice   Decimal?                 @map("compare_at_price") @db.Decimal(10, 2)
-  stockQuantity    Int                      @default(0) @map("stock_quantity")
-  categoryId       String?                  @map("category_id") 
-  isFeatured       Boolean                  @default(false) @map("is_featured")
-  hasVariants      Boolean                  @default(false) @map("has_variants")
-  createdAt        DateTime                 @default(now()) @map("created_at")
-  updatedAt        DateTime                 @updatedAt @map("updated_at")
+  descriptionAr    String?           @map("description_ar")
+  price            Decimal           @db.Decimal(10, 2)
+  cost             Decimal?          @db.Decimal(10, 2)
+  compareAtPrice   Decimal?          @map("compare_at_price") @db.Decimal(10, 2)
+  stockQuantity    Int?              @default(0) @map("stock_quantity")
+  categoryId       String?           @map("category_id") @db.Uuid
+  isFeatured       Boolean?          @default(false) @map("is_featured")
+  hasVariants      Boolean?          @default(false) @map("has_variants")
+  createdAt        DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime?         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   campaignProducts CampaignProduct[]
   orderItems       OrderItem[]
   colors           ProductColor[]
   images           ProductImage[]
   sizes            ProductSize[]
   variants         ProductVariant[]
-  category         Category?                @relation(fields: [categoryId], references: [id])
+  category         Category?         @relation(fields: [categoryId], references: [id], onUpdate: NoAction)
 
-  @@index([categoryId])
-  @@index([price])
-  @@index([isFeatured])
-  @@index([createdAt])
-  @@index([categoryId, price])
   @@map("products")
 }
 
 model ProductImage {
-  id        String  @id @default(uuid())
-  productId String  @map("product_id")
+  id        String   @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String   @map("product_id") @db.Uuid
   url       String
   alt       String?
-  sortOrder Int     @default(0) @map("sort_order")
-  isPrimary Boolean @default(false) @map("is_primary")
-  product   Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder Int?     @default(0) @map("sort_order")
+  isPrimary Boolean? @default(false) @map("is_primary")
+  product   Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([productId, isPrimary])
   @@map("product_images")
 }
 
 model ProductColor {
-  id        String           @id @default(uuid())
-  productId String           @map("product_id")
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String           @map("product_id") @db.Uuid
   name      String
   hexCode   String?          @map("hex_code")
-  sortOrder Int              @default(0) @map("sort_order")
-  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sortOrder Int?             @default(0) @map("sort_order")
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   variants  ProductVariant[]
 
   @@unique([productId, name])
-  @@index([productId])
   @@map("product_colors")
 }
 
 model ProductSize {
-  id        String           @id @default(uuid())
-  productId String           @map("product_id")
+  id        String           @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId String           @map("product_id") @db.Uuid
   value     String
-  sizeType  SizeType         @default(letter) @map("size_type")
-  sortOrder Int              @default(0) @map("sort_order")
-  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade)
+  sizeType  size_type?       @default(letter) @map("size_type")
+  sortOrder Int?             @default(0) @map("sort_order")
+  product   Product          @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
   variants  ProductVariant[]
 
   @@unique([productId, value])
-  @@index([productId])
   @@map("product_sizes")
 }
 
 model ProductVariant {
-  id            String        @id @default(uuid())
-  productId     String        @map("product_id")
-  colorId       String?       @map("color_id")
-  sizeId        String?       @map("size_id")
-  stockQuantity Int           @default(0) @map("stock_quantity")
-  reservedQty   Int           @default(0) @map("reserved_qty")
-  soldCount     Int           @default(0) @map("sold_count")
-  revenue       Decimal       @default(0) @db.Decimal(12, 2)
+  id            String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  productId     String        @map("product_id") @db.Uuid
+  colorId       String?       @map("color_id") @db.Uuid
+  sizeId        String?       @map("size_id") @db.Uuid
+  stockQuantity Int?          @default(0) @map("stock_quantity")
+  reservedQty   Int?          @default(0) @map("reserved_qty")
+  soldCount     Int?          @default(0) @map("sold_count")
+  revenue       Decimal?      @default(0) @db.Decimal(12, 2)
   orderItems    OrderItem[]
-  color         ProductColor? @relation(fields: [colorId], references: [id])
-  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade)
-  size          ProductSize?  @relation(fields: [sizeId], references: [id])
+  color         ProductColor? @relation(fields: [colorId], references: [id], onUpdate: NoAction)
+  product       Product       @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  size          ProductSize?  @relation(fields: [sizeId], references: [id], onUpdate: NoAction)
 
   @@unique([productId, colorId, sizeId])
-  @@index([productId])
   @@map("product_variants")
 }
 
 model Order {
-  id               String        @id @default(uuid())
+  id               String        @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   orderNumber      String        @unique @map("order_number")
   customerName     String        @map("customer_name")
   customerPhone    String        @map("customer_phone")
   customerWilaya   String        @map("customer_wilaya")
   customerBaladiya String?       @map("customer_baladiya")
-  subtotal         Decimal       @db.Decimal(10, 2) 
-  deliveryFee      Decimal       @default(0) @map("delivery_fee") @db.Decimal(10, 2)
+  subtotal         Decimal       @db.Decimal(10, 2)
+  deliveryFee      Decimal?      @default(0) @map("delivery_fee") @db.Decimal(10, 2)
   total            Decimal       @db.Decimal(10, 2)
-  status           OrderStatus   @default(pending)
-  orderSource      OrderSource   @default(website) @map("order_source") 
-  posSessionId     String?       @map("pos_session_id")
-  createdById      String?       @map("created_by")
-  confirmedAt      DateTime?     @map("confirmed_at")
-  shippedAt        DateTime?     @map("shipped_at")
-  deliveredAt      DateTime?     @map("delivered_at")
-  cancelledAt      DateTime?     @map("cancelled_at")
-  createdAt        DateTime      @default(now()) @map("created_at")
-  updatedAt        DateTime      @updatedAt @map("updated_at")
+  status           order_status? @default(pending)
+  orderSource      order_source? @default(website) @map("order_source")
+  posSessionId     String?       @map("pos_session_id") @db.Uuid
+  createdById      String?       @map("created_by") @db.Uuid
+  confirmedAt      DateTime?     @map("confirmed_at") @db.Timestamptz(6)
+  shippedAt        DateTime?     @map("shipped_at") @db.Timestamptz(6)
+  deliveredAt      DateTime?     @map("delivered_at") @db.Timestamptz(6)
+  cancelledAt      DateTime?     @map("cancelled_at") @db.Timestamptz(6)
+  createdAt        DateTime?     @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime?     @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   orderItems       OrderItem[]
-  createdBy        User?         @relation("CreatedByUser", fields: [createdById], references: [id])
+  createdBy        User?         @relation("CreatedByUser", fields: [createdById], references: [id], onUpdate: NoAction)
 
-  @@index([customerPhone])
-  @@index([status])
-  @@index([createdAt])
-  @@index([createdAt, status])
   @@map("orders")
 }
 
 model OrderItem {
-  id            String          @id @default(uuid())
-  orderId       String          @map("order_id")
-  productId     String?         @map("product_id")
-  variantId     String?         @map("variant_id")
-  productName   String          @map("product_name") //review
-  productSku    String?         @map("product_sku") //review
+  id            String          @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
+  orderId       String          @map("order_id") @db.Uuid
+  productId     String?         @map("product_id") @db.Uuid
+  variantId     String?         @map("variant_id") @db.Uuid
+  productName   String          @map("product_name")
+  productSku    String?         @map("product_sku")
   selectedColor String?         @map("selected_color")
   selectedSize  String?         @map("selected_size")
   quantity      Int
@@ -174,58 +159,55 @@ model OrderItem {
   unitCost      Decimal?        @map("unit_cost") @db.Decimal(10, 2)
   lineTotal     Decimal         @map("line_total") @db.Decimal(10, 2)
   lineProfit    Decimal?        @map("line_profit") @db.Decimal(10, 2)
-  createdAt     DateTime        @default(now()) @map("created_at")
-  order         Order           @relation(fields: [orderId], references: [id], onDelete: Cascade)
-  product       Product?        @relation(fields: [productId], references: [id])
-  variant       ProductVariant? @relation(fields: [variantId], references: [id])
+  createdAt     DateTime?       @default(now()) @map("created_at") @db.Timestamptz(6)
+  order         Order           @relation(fields: [orderId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product       Product?        @relation(fields: [productId], references: [id], onDelete: NoAction, onUpdate: NoAction)
+  variant       ProductVariant? @relation(fields: [variantId], references: [id], onDelete: NoAction, onUpdate: NoAction)
 
-  @@index([productId])
-  @@index([orderId])
   @@map("order_items")
 }
 
 model Campaign {
-  id               String            @id @default(uuid())
+  id               String            @id @default(dbgenerated("gen_random_uuid()")) @db.Uuid
   name             String
   description      String?
   cost             Decimal           @db.Decimal(10, 2)
-  budget           Decimal?          @db.Decimal(10, 2) //review
-  startDate        DateTime          @map("start_date")
-  endDate          DateTime?         @map("end_date")
+  budget           Decimal?          @db.Decimal(10, 2)
+  startDate        DateTime          @map("start_date") @db.Timestamptz(6)
+  endDate          DateTime?         @map("end_date") @db.Timestamptz(6)
   campaignType     String?           @map("campaign_type")
-  isActive         Boolean           @default(true) @map("is_active")
-  createdById      String            @map("created_by")
-  createdAt        DateTime          @default(now()) @map("created_at")
-  updatedAt        DateTime          @updatedAt @map("updated_at")
+  isActive         Boolean?          @default(true) @map("is_active")
+  createdById      String            @map("created_by") @db.Uuid
+  createdAt        DateTime?         @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt        DateTime?         @default(now()) @updatedAt @map("updated_at") @db.Timestamptz(6)
   campaignProducts CampaignProduct[]
-  createdBy        User              @relation(fields: [createdById], references: [id])
+  createdBy        User              @relation(fields: [createdById], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
-  @@index([startDate, endDate])
   @@map("campaigns")
 }
 
-model CampaignProduct { //review
-  campaignId    String   @map("campaign_id")
-  productId     String   @map("product_id")
+model CampaignProduct {
+  campaignId    String   @map("campaign_id") @db.Uuid
+  productId     String   @map("product_id") @db.Uuid
   allocatedCost Decimal? @map("allocated_cost") @db.Decimal(10, 2)
-  impressions   Int      @default(0)
-  clicks        Int      @default(0)
-  conversions   Int      @default(0)
-  revenue       Decimal  @default(0) @db.Decimal(12, 2)
-  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade)
-  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade)
+  impressions   Int?     @default(0)
+  clicks        Int?     @default(0)
+  conversions   Int?     @default(0)
+  revenue       Decimal? @default(0) @db.Decimal(12, 2)
+  campaign      Campaign @relation(fields: [campaignId], references: [id], onDelete: Cascade, onUpdate: NoAction)
+  product       Product  @relation(fields: [productId], references: [id], onDelete: Cascade, onUpdate: NoAction)
 
   @@id([campaignId, productId])
   @@map("campaign_products")
 }
 
-
-enum UserRole {
-  admin
-  sub_admin
+enum order_source {
+  website
+  pos
+  phone
 }
 
-enum OrderStatus {
+enum order_status {
   pending
   confirmed
   processing
@@ -235,21 +217,20 @@ enum OrderStatus {
   refunded
 }
 
-enum PaymentStatus {
+enum payment_status {
   pending
   paid
   failed
   refunded
 }
 
-enum OrderSource {
-  website
-  pos
-  phone
-}
-
-enum SizeType {
+enum size_type {
   letter
   numeric
   custom
+}
+
+enum user_role {
+  admin
+  sub_admin
 }

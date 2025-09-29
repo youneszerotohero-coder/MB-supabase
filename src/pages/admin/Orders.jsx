@@ -86,10 +86,10 @@ export default function Orders() {
   const orders = ordersData?.orders || [];
 
   // Filter unique wilayas from current orders for the filter dropdown
-  const uniqueWilayas = [...new Set(orders.map(order => order.customerWilaya))].filter(Boolean);
+  const uniqueWilayas = [...new Set(orders.map(order => order.customer_wilaya))].filter(Boolean);
 
   const filteredOrders = orders.filter(order => {
-    const matchesWilaya = wilayaFilter === "all" || order.customerWilaya === wilayaFilter;
+    const matchesWilaya = wilayaFilter === "all" || order.customer_wilaya === wilayaFilter;
     return matchesWilaya;
   });
 
@@ -278,23 +278,23 @@ export default function Orders() {
                       <tr key={order.id} className="border-b border-border/50 hover:bg-muted/30">
                         <td className="py-4 px-6">
                           <div className="font-mono text-sm font-medium text-primary">
-                            {order.orderNumber}
+                            {order.order_number}
                           </div>
                         </td>
                         <td className="py-4 px-6">
-                          <div className="font-medium text-foreground">{order.customerName}</div>
+                          <div className="font-medium text-foreground">{order.customer_name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {order.orderItems?.length || 0} items
+                            {order.order_items?.length || 0} items
                           </div>
-                          {order.customerPhone && (
+                          {order.customer_phone && (
                             <div className="text-sm text-muted-foreground">
-                              {order.customerPhone}
+                              {order.customer_phone}
                             </div>
                           )}
                         </td>
                         <td className="py-4 px-6">
-                          <div className="text-foreground">{order.customerWilaya}</div>
-                          <div className="text-sm text-muted-foreground">{order.customerBaladiya}</div>
+                          <div className="text-foreground">{order.customer_wilaya}</div>
+                          <div className="text-sm text-muted-foreground">{order.customer_baladiya}</div>
                         </td>
                         <td className="py-4 px-6">
                           {getStatusBadge(order.status)}
@@ -303,7 +303,7 @@ export default function Orders() {
                           {formatPrice(order.total)}
                         </td>
                         <td className="py-4 px-6 text-muted-foreground">
-                          {formatDate(order.createdAt)}
+                          {formatDate(order.created_at)}
                         </td>
                         <td className="py-4 px-6">
                           <div className="flex gap-2">

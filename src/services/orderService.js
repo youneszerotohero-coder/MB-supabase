@@ -190,8 +190,8 @@ export const createOrder = async (orderData) => {
       if (item.productId) {
         // Update main product stock
         const { error: stockError } = await supabase.rpc('decrement_product_stock', {
-          product_id: item.productId,
-          quantity: item.quantity
+          p_product_id: item.productId,
+          p_quantity: item.quantity
         })
         
         if (stockError) {

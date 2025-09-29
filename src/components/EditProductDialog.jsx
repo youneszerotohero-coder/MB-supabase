@@ -38,7 +38,6 @@ export function EditProductDialog({ open, onOpenChange, product }) {
     categoryId: '',
     stockQuantity: '',
     brand: '',
-    isActive: true,
     isFeatured: false
   });
   const [imageUrls, setImageUrls] = useState('');
@@ -88,15 +87,15 @@ export function EditProductDialog({ open, onOpenChange, product }) {
       setFormData({
         name: product.name || '',
         description: product.description || '',
-        descriptionAr: product.descriptionAr || '',
+        descriptionAr: product.description_ar || '', // Use snake_case from database
         price: product.price?.toString() || '',
         cost: product.cost?.toString() || '',
-        compareAtPrice: product.compareAtPrice?.toString() || '',
-        categoryId: product.categoryId || '',
-        stockQuantity: product.stockQuantity?.toString() || '',
+        compareAtPrice: product.compare_at_price?.toString() || '', // Use snake_case from database
+        categoryId: product.category_id || '', // Use snake_case from database
+        stockQuantity: product.stock_quantity?.toString() || '', // Use snake_case from database
         brand: product.brand || '',
-        isActive: product.isActive ?? true,
-        isFeatured: product.isFeatured ?? false
+        // isActive field removed as it doesn't exist in database
+        isFeatured: product.is_featured ?? false // Use snake_case from database
       });
       // Convert existing images to comma-separated URLs
       const imageUrlsString = product.images ? product.images.map(img => img.url).join(', ') : '';
@@ -274,45 +273,6 @@ export function EditProductDialog({ open, onOpenChange, product }) {
                       )}
                     </SelectContent>
                   </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="brand">Brand *</Label>
-                  <Input
-                    id="brand"
-                    placeholder="Enter brand name"
-                    value={formData.brand}
-                    onChange={(e) =>
-                      setFormData({ ...formData, brand: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="isActive"
-                        checked={formData.isActive}
-                        onCheckedChange={(checked) =>
-                          setFormData({ ...formData, isActive: checked })
-                        }
-                      />
-                      <Label htmlFor="isActive">Active</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="isFeatured"
-                        checked={formData.isFeatured}
-                        onCheckedChange={(checked) =>
-                          setFormData({ ...formData, isFeatured: checked })
-                        }
-                      />
-                      <Label htmlFor="isFeatured">Featured</Label>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

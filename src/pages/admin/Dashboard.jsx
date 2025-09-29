@@ -346,7 +346,7 @@ export default function Dashboard() {
                           {product.profitMargin}%
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-foreground">{formatNumber(product.stockQuantity || 0)}</td>
+                      <td className="py-3 px-4 text-foreground">{formatNumber(product.stock_quantity || 0)}</td>
                     </tr>
                   ))}
                 </tbody>

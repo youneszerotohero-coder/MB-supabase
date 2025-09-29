@@ -38,7 +38,6 @@ export function AddProductDialog({ open, onOpenChange }) {
     categoryId: '',
     stockQuantity: '',
     brand: '',
-    isActive: true,
     isFeatured: false
   });
   const [selectedSizes, setSelectedSizes] = useState([]);
@@ -197,7 +196,6 @@ export function AddProductDialog({ open, onOpenChange }) {
         categoryId: '',
         stockQuantity: '',
         brand: '',
-        isActive: true,
         isFeatured: false
       });
       setSelectedSizes([]);
@@ -329,19 +327,6 @@ export function AddProductDialog({ open, onOpenChange }) {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="brand">Brand *</Label>
-                  <Input
-                    id="brand"
-                    placeholder="Enter brand name"
-                    value={formData.brand}
-                    onChange={(e) =>
-                      setFormData({ ...formData, brand: e.target.value })
-                    }
-                    required
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label>Available Sizes</Label>
                   <div className="flex flex-wrap gap-2">
                     {sizeOptions.map((size) => (
@@ -395,32 +380,6 @@ export function AddProductDialog({ open, onOpenChange }) {
                       Selected: {selectedColors.map(c => colorOptions.find(opt => opt.value === c)?.label).join(', ')}
                     </p>
                   )}
-                </div>
-
-
-                <div className="space-y-2">
-                  <div className="flex items-center space-x-4">
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="isActive"
-                        checked={formData.isActive}
-                        onCheckedChange={(checked) =>
-                          setFormData({ ...formData, isActive: checked })
-                        }
-                      />
-                      <Label htmlFor="isActive">Active</Label>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      <Switch
-                        id="isFeatured"
-                        checked={formData.isFeatured}
-                        onCheckedChange={(checked) =>
-                          setFormData({ ...formData, isFeatured: checked })
-                        }
-                      />
-                      <Label htmlFor="isFeatured">Featured</Label>
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>

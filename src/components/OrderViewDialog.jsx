@@ -134,7 +134,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Package className="w-5 h-5" />
-            Order Details - {order.orderNumber}
+            Order Details - {order.order_number}
           </DialogTitle>
         </DialogHeader>
 
@@ -156,14 +156,14 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
                   <Calendar className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-muted-foreground">Order Date</p>
-                    <p className="font-medium">{formatDate(order.createdAt)}</p>
+                    <p className="font-medium">{formatDate(order.created_at)}</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
                   <Package className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-muted-foreground">Items</p>
-                    <p className="font-medium">{order.orderItems?.length || 0} items</p>
+                    <p className="font-medium">{order.order_items?.length || 0} items</p>
                   </div>
                 </div>
                 <div className="flex items-center gap-2">
@@ -177,7 +177,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
                   <Truck className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-muted-foreground">Shipping</p>
-                    <p className="font-medium">{formatPrice(order.deliveryFee)}</p>
+                    <p className="font-medium">{formatPrice(order.delivery_fee)}</p>
                   </div>
                 </div>
               </div>
@@ -196,21 +196,21 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <p className="text-sm text-muted-foreground">Customer Name</p>
-                  <p className="font-medium">{order.customerName}</p>
+                  <p className="font-medium">{order.customer_name}</p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Phone className="w-4 h-4 text-muted-foreground" />
                   <div>
                     <p className="text-sm text-muted-foreground">Phone</p>
-                    <p className="font-medium">{order.customerPhone}</p>
+                    <p className="font-medium">{order.customer_phone}</p>
                   </div>
                 </div>
-                {order.customerEmail && (
+                {order.customer_email && (
                   <div className="flex items-center gap-2">
                     <Mail className="w-4 h-4 text-muted-foreground" />
                     <div>
                       <p className="text-sm text-muted-foreground">Email</p>
-                      <p className="font-medium">{order.customerEmail}</p>
+                      <p className="font-medium">{order.customer_email}</p>
                     </div>
                   </div>
                 )}
@@ -219,8 +219,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
                   <div>
                     <p className="text-sm text-muted-foreground">Address</p>
                     <p className="font-medium">
-                      {order.customerAddress}<br />
-                      {order.customerBaladiya}, {order.customerWilaya}
+                      {order.customer_baladiya}, {order.customer_wilaya}
                     </p>
                   </div>
                 </div>
@@ -235,34 +234,34 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {order.orderItems?.map((item, index) => (
+                {order.order_items?.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
                       <div className="flex items-start justify-between">
                         <div>
-                          <h4 className="font-medium">{item.productName}</h4>
-                          {item.productSku && (
-                            <p className="text-sm text-muted-foreground">SKU: {item.productSku}</p>
+                          <h4 className="font-medium">{item.product_name}</h4>
+                          {item.product_sku && (
+                            <p className="text-sm text-muted-foreground">SKU: {item.product_sku}</p>
                           )}
-                          {(item.selectedColor || item.selectedSize) && (
+                          {(item.selected_color || item.selected_size) && (
                             <div className="flex gap-4 mt-1">
-                              {item.selectedColor && (
+                              {item.selected_color && (
                                 <span className="text-sm text-muted-foreground">
-                                  Color: {item.selectedColor}
+                                  Color: {item.selected_color}
                                 </span>
                               )}
-                              {item.selectedSize && (
+                              {item.selected_size && (
                                 <span className="text-sm text-muted-foreground">
-                                  Size: {item.selectedSize}
+                                  Size: {item.selected_size}
                                 </span>
                               )}
                             </div>
                           )}
                         </div>
                         <div className="text-right">
-                          <p className="font-medium">{formatPrice(item.lineTotal)}</p>
+                          <p className="font-medium">{formatPrice(item.line_total)}</p>
                           <p className="text-sm text-muted-foreground">
-                            {formatPrice(item.unitPrice)} × {item.quantity}
+                            {formatPrice(item.unit_price)} × {item.quantity}
                           </p>
                         </div>
                       </div>
@@ -281,12 +280,12 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
                 </div>
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Shipping Fee</span>
-                  <span className="font-medium">{formatPrice(order.deliveryFee)}</span>
+                  <span className="font-medium">{formatPrice(order.delivery_fee)}</span>
                 </div>
-                {order.discountAmount > 0 && (
+                {order.discount_amount > 0 && (
                   <div className="flex justify-between text-green-600">
                     <span>Discount</span>
-                    <span>-{formatPrice(order.discountAmount)}</span>
+                    <span>-{formatPrice(order.discount_amount)}</span>
                   </div>
                 )}
                 <Separator />
