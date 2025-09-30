@@ -3,16 +3,30 @@ import {
   ShoppingCart, 
   Package, 
   DollarSign,
-  ArrowUpRight,
-  ArrowDownRight,
-  Calendar,
   RefreshCw,
-  Filter
+  ChevronLeft,
+  ChevronRight,
+  Megaphone,
+  Globe,
+  Store
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
+import { useQueryClient } from '@tanstack/react-query';
 import analyticsService from "@/services/analyticsService";
-import DateRangePicker from "@/components/DateRangePicker";
+import { 
+  LineChart, 
+  Line, 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  Legend, 
+  ResponsiveContainer 
+} from 'recharts';
 
 // Helper function to format currency
 const formatCurrency = (amount) => {
@@ -28,27 +42,37 @@ const formatNumber = (num) => {
 };
 
 export default function Dashboard() {
+  const queryClient = useQueryClient();
   const [dashboardData, setDashboardData] = useState(null);
-  const [salesData, setSalesData] = useState([]);
+  const [chartData, setChartData] = useState([]);
   const [productData, setProductData] = useState([]);
-  const [totalStockValue, setTotalStockValue] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [dateRange, setDateRange] = useState({
-    fromDate: null,
-    toDate: null
-  });
-  const [profitabilityFilters, setProfitabilityFilters] = useState({
-    sortBy: 'profit',
-    sortOrder: 'desc'
-  });
+  const [period, setPeriod] = useState('daily'); // daily, weekly, monthly - single period for both stats and chart
+  const [currentPage, setCurrentPage] = useState(1);
+  const [pagination, setPagination] = useState({ page: 1, limit: 10, total: 0, totalPages: 0 });
 
-  // Handle date range changes
-  const handleDateChange = (type, value) => {
-    setDateRange(prev => ({
-      ...prev,
-      [type]: value
-    }));
+  // Listen for campaign changes to refresh dashboard
+  useEffect(() => {
+    const unsubscribe = queryClient.getQueryCache().subscribe((event) => {
+      if (event?.query?.queryKey?.[0] === 'admin_campaigns') {
+        // Refresh dashboard when campaigns are modified
+        fetchDashboardData();
+        fetchProductData();
+      }
+    });
+
+    return () => unsubscribe?.();
+  }, [queryClient]);
+
+  // Get days based on period
+  const getDaysForPeriod = (period) => {
+    switch (period) {
+      case 'daily': return 30;
+      case 'weekly': return 84; // ~12 weeks
+      case 'monthly': return 365; // 12 months
+      default: return 30;
+    }
   };
 
   // Fetch dashboard data
@@ -57,19 +81,19 @@ export default function Dashboard() {
       setLoading(true);
       setError(null);
       
-      const [stats, sales, stockValue] = await Promise.all([
-        analyticsService.getDashboardStats(dateRange.fromDate, dateRange.toDate),
-        analyticsService.getSalesOverTime('daily', 30),
-        analyticsService.getTotalStockValue()
+      const [stats, chart] = await Promise.all([
+        analyticsService.getDashboardStats(period, getDaysForPeriod(period)),
+        analyticsService.getChartData(
+          period, 
+          getDaysForPeriod(period)
+        )
       ]);
 
       setDashboardData(stats);
-      setSalesData(Array.isArray(sales) ? sales : []);
-      setTotalStockValue(stockValue || 0);
+      setChartData(Array.isArray(chart) ? chart : []);
     } catch (err) {
       console.error('Error fetching dashboard data:', err);
       
-      // Check if it's a 500 error (server error) vs other errors
       if (err.response?.status === 500) {
         setError('Server error occurred. Please check if the backend is running and try again.');
       } else if (err.response?.status === 401) {
@@ -80,25 +104,23 @@ export default function Dashboard() {
         setError('Failed to load dashboard data. Please try again.');
       }
       
-      // Set empty data on error to prevent crashes
       setDashboardData(null);
-      setSalesData([]);
-      setTotalStockValue(0);
+      setChartData([]);
     } finally {
       setLoading(false);
     }
   };
 
-  // Fetch product profitability data with filters
+  // Fetch product performance data with pagination
   const fetchProductData = async () => {
     try {
-      const products = await analyticsService.getProductProfitability(
-        null, 
-        50, 
-        profitabilityFilters.sortBy, 
-        profitabilityFilters.sortOrder
+      const response = await analyticsService.getProductPerformance(
+        10,
+        currentPage
       );
-      setProductData(Array.isArray(products) ? products : []);
+      
+      setProductData(Array.isArray(response.data) ? response.data : []);
+      setPagination(response.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 });
     } catch (err) {
       console.error('Error fetching product data:', err);
       setProductData([]);
@@ -107,17 +129,11 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchDashboardData();
-  }, [dateRange]);
+  }, [period]);
 
   useEffect(() => {
     fetchProductData();
-  }, [profitabilityFilters]);
-
-  // Calculate percentage change (mock calculation for now)
-  const calculateChange = (current, previous) => {
-    if (!previous || previous === 0) return 0;
-    return ((current - previous) / previous) * 100;
-  };
+  }, [currentPage]);
 
   // Generate stats array from dashboard data
   const getStatsArray = () => {
@@ -127,36 +143,68 @@ export default function Dashboard() {
       {
         name: "Total Revenue",
         value: formatCurrency(dashboardData.revenue || 0),
-        change: "+12.5%", // Mock data - would need historical data for real calculation
-        changeType: "positive",
+        breakdown: [
+          { label: "Online", value: formatCurrency(dashboardData.onlineRevenue || 0), icon: Globe },
+          { label: "In-Store", value: formatCurrency(dashboardData.instoreRevenue || 0), icon: Store }
+        ],
         icon: DollarSign,
-        color: "dashboard-revenue"
+        color: "bg-blue-500"
       },
       {
-        name: "Total Orders",
-        value: formatNumber(dashboardData.ordersCount || 0),
-        change: "+8.2%", // Mock data
-        changeType: "positive", 
-        icon: ShoppingCart,
-        color: "dashboard-orders"
-      },
-      {
-        name: "Total Stock Value",
-        value: formatCurrency(totalStockValue || 0),
-        change: "+3.2%", // Mock data
-        changeType: "positive",
-        icon: Package,
-        color: "dashboard-stock"
-      },
-      {
-        name: "Net Profit",
+        name: "Total Profit",
         value: formatCurrency(dashboardData.netProfit || 0),
-        change: "+15.8%", // Mock data
-        changeType: "positive",
+        breakdown: [
+          { label: "Online", value: formatCurrency(dashboardData.onlineProfit || 0), icon: Globe },
+          { label: "In-Store", value: formatCurrency(dashboardData.instoreProfit || 0), icon: Store }
+        ],
         icon: TrendingUp,
-        color: "dashboard-profit"
+        color: "bg-green-500"
+      },
+      {
+        name: "Stock Value",
+        value: formatCurrency(dashboardData.stockValue || 0),
+        icon: Package,
+        color: "bg-purple-500"
+      },
+      {
+        name: "Campaign Spend",
+        value: formatCurrency(dashboardData.campaignSpend || 0),
+        icon: Megaphone,
+        color: "bg-orange-500"
       },
     ];
+  };
+
+  // Format date based on period
+  const formatDateForPeriod = (dateString, period) => {
+    const date = new Date(dateString);
+    switch (period) {
+      case 'daily':
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      case 'weekly':
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+      case 'monthly':
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      default:
+        return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    }
+  };
+
+  // Custom tooltip for chart
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+          <p className="font-semibold mb-2">{formatDateForPeriod(label, period)}</p>
+          {payload.map((entry, index) => (
+            <p key={index} className="text-sm" style={{ color: entry.color }}>
+              {entry.name}: {formatCurrency(entry.value)}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
   };
 
   if (loading) {
@@ -178,12 +226,9 @@ export default function Dashboard() {
         <div className="flex items-center justify-center h-64">
           <div className="text-center">
             <p className="text-red-500 mb-4">{error}</p>
-            <button 
-              onClick={fetchDashboardData}
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90"
-            >
+            <Button onClick={fetchDashboardData}>
               Retry
-            </button>
+            </Button>
           </div>
         </div>
       </div>
@@ -200,84 +245,153 @@ export default function Dashboard() {
             Overview of your e-commerce performance
           </p>
         </div>
-        <div className="flex items-center space-x-2 bg-white">
-          <DateRangePicker 
-            onDateChange={handleDateChange}
-            fromDate={dateRange.fromDate}
-            toDate={dateRange.toDate}
-          />
-          <button
+        <div className="flex items-center gap-2">
+          {/* Period Toggle */}
+          <div className="flex gap-2 bg-muted p-1 rounded-lg">
+            <Button
+              variant={period === 'daily' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setPeriod('daily')}
+            >
+              Day
+            </Button>
+            <Button
+              variant={period === 'weekly' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setPeriod('weekly')}
+            >
+              Week
+            </Button>
+            <Button
+              variant={period === 'monthly' ? 'default' : 'ghost'}
+              size="sm"
+              onClick={() => setPeriod('monthly')}
+            >
+              Month
+            </Button>
+          </div>
+          
+          {/* Refresh Button */}
+          <Button
             onClick={fetchDashboardData}
             disabled={loading}
-            className="p-2 rounded-md border border-border hover:bg-muted/50 disabled:opacity-50 disabled:cursor-not-allowed"
+            variant="outline"
+            size="icon"
             title="Refresh data"
           >
             <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-          </button>
+          </Button>
         </div>
       </div>
 
-      {/* Stats Cards */}
+      {/* Top Section - 4 Cards with Breakdowns */}
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {getStatsArray().map((stat) => (
-          <Card key={stat.name} className="stats-card hover-lift">
+          <Card key={stat.name} className="hover:shadow-lg transition-shadow">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium text-muted-foreground">
                 {stat.name}
               </CardTitle>
-              <div className={`p-2 rounded-lg ${stat.color === 'dashboard-revenue' ? 'bg-dashboard-revenue/10' : stat.color === 'dashboard-orders' ? 'bg-dashboard-orders/10' : stat.color === 'dashboard-stock' ? 'bg-dashboard-stock/10' : 'bg-dashboard-profit/10'}`}>
-                <stat.icon className={`h-4 w-4 ${stat.color === 'dashboard-revenue' ? 'text-dashboard-revenue' : stat.color === 'dashboard-orders' ? 'text-dashboard-orders' : stat.color === 'dashboard-stock' ? 'text-dashboard-stock' : 'text-dashboard-profit'}`} />
+              <div className={`p-2 rounded-lg ${stat.color} bg-opacity-10`}>
+                <stat.icon className={`h-5 w-5 ${stat.color.replace('bg-', 'text-')}`} />
               </div>
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-foreground">{stat.value}</div>
-              <div className="flex items-center text-xs text-success mt-1">
-                <ArrowUpRight className="h-3 w-3 mr-1" />
-                {stat.change} from last month
-              </div>
+              
+              {/* Breakdown for Revenue and Profit */}
+              {stat.breakdown && (
+                <div className="mt-3 space-y-2 pt-3 border-t">
+                  {stat.breakdown.map((item, index) => (
+                    <div key={index} className="flex items-center justify-between text-sm">
+                      <div className="flex items-center gap-1.5 text-muted-foreground">
+                        <item.icon className="h-3.5 w-3.5" />
+                        <span>{item.label}</span>
+                      </div>
+                      <span className="font-semibold text-foreground">{item.value}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </CardContent>
           </Card>
         ))}
       </div>
 
-      {/* Sales Chart Section */}
-      <Card className="hover-lift">
+      {/* Middle Section - Sales Graph */}
+      <Card className="hover:shadow-lg transition-shadow">
         <CardHeader>
-          <CardTitle className="text-foreground">Sales Over Time</CardTitle>
-          <p className="text-sm text-muted-foreground">Daily revenue trend (Last 30 days)</p>
+          <div>
+            <CardTitle className="text-foreground">Sales Analytics</CardTitle>
+            <p className="text-sm text-muted-foreground">
+              Campaign spend vs revenue vs profit over time
+            </p>
+          </div>
         </CardHeader>
         <CardContent>
-          <div className="h-64">
-            {salesData.length > 0 ? (
-              <div className="h-full flex flex-col justify-between">
-                <div className="flex items-end justify-between h-48 space-x-1">
-                  {salesData.map((day, index) => {
-                    const maxRevenue = Math.max(...salesData.map(d => d.revenue));
-                    const height = (day.revenue / maxRevenue) * 100;
-                    return (
-                      <div key={index} className="flex flex-col items-center flex-1">
-                        <div 
-                          className="bg-primary rounded-t w-full transition-all duration-300 hover:bg-primary/80"
-                          style={{ height: `${height}%` }}
-                          title={`${new Date(day.date).toLocaleDateString()}: ${formatCurrency(day.revenue)}`}
-                        />
-                        <div className="text-xs text-muted-foreground mt-2 transform -rotate-45 origin-left">
-                          {new Date(day.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-                <div className="flex justify-between text-xs text-muted-foreground mt-2">
-                  <span>Total: {formatCurrency(salesData.reduce((sum, day) => sum + Number(day.revenue), 0))}</span>
-                  <span>Orders: {salesData.reduce((sum, day) => sum + Number(day.orders), 0)}</span>
-                </div>
-              </div>
+          <div className="h-80">
+            {chartData.length > 0 ? (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartData}>
+                  <defs>
+                    <linearGradient id="colorRevenue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorProfit" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#10b981" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                    </linearGradient>
+                    <linearGradient id="colorCampaign" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="#f97316" stopOpacity={0.8}/>
+                      <stop offset="95%" stopColor="#f97316" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis 
+                    dataKey="date" 
+                    stroke="#6b7280"
+                    style={{ fontSize: '12px' }}
+                    tickFormatter={(value) => formatDateForPeriod(value, period)}
+                  />
+                  <YAxis 
+                    stroke="#6b7280"
+                    style={{ fontSize: '12px' }}
+                    tickFormatter={(value) => `$${(value / 1000).toFixed(0)}k`}
+                  />
+                  <Tooltip content={<CustomTooltip />} />
+                  <Legend />
+                  <Area 
+                    type="monotone" 
+                    dataKey="revenue" 
+                    name="Revenue"
+                    stroke="#3b82f6" 
+                    fillOpacity={1} 
+                    fill="url(#colorRevenue)" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="profit" 
+                    name="Profit"
+                    stroke="#10b981" 
+                    fillOpacity={1} 
+                    fill="url(#colorProfit)" 
+                  />
+                  <Area 
+                    type="monotone" 
+                    dataKey="campaignSpend" 
+                    name="Campaign Spend"
+                    stroke="#f97316" 
+                    fillOpacity={1} 
+                    fill="url(#colorCampaign)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
             ) : (
               <div className="h-full flex items-center justify-center border-2 border-dashed border-muted rounded-lg">
                 <div className="text-center">
                   <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">No sales data available</p>
+                  <p className="text-muted-foreground">No chart data available</p>
                 </div>
               </div>
             )}
@@ -285,82 +399,111 @@ export default function Dashboard() {
         </CardContent>
       </Card>
 
-      {/* Profitability Analysis Table */}
-      <Card className="hover-lift">
+      {/* Bottom Section - Products Table */}
+      <Card className="hover:shadow-lg transition-shadow">
         <CardHeader>
-          <div className="flex justify-between items-start">
-            <div>
-              <CardTitle className="text-foreground">Profitability Analysis</CardTitle>
-              <p className="text-sm text-muted-foreground">
-                Revenue, cost, and profit breakdown by product
-              </p>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="flex items-center space-x-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <select
-                  value={profitabilityFilters.sortBy}
-                  onChange={(e) => setProfitabilityFilters(prev => ({ ...prev, sortBy: e.target.value }))}
-                  className="px-2 py-1 text-sm border border-border rounded-md bg-background text-foreground"
-                >
-                  <option value="profit">Sort by Profit</option>
-                  <option value="stock">Sort by Stock</option>
-                  <option value="revenue">Sort by Revenue</option>
-                  <option value="margin">Sort by Margin</option>
-                </select>
-                <select
-                  value={profitabilityFilters.sortOrder}
-                  onChange={(e) => setProfitabilityFilters(prev => ({ ...prev, sortOrder: e.target.value }))}
-                  className="px-2 py-1 text-sm border border-border rounded-md bg-background text-foreground"
-                >
-                  <option value="desc">High to Low</option>
-                  <option value="asc">Low to High</option>
-                </select>
-              </div>
-            </div>
-          </div>
+          <CardTitle className="text-foreground">Product Performance</CardTitle>
+          <p className="text-sm text-muted-foreground">
+            Profit = sales only • Performance = includes inventory investment
+          </p>
         </CardHeader>
         <CardContent>
           <div className="overflow-x-auto">
             {productData.length > 0 ? (
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-border">
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Revenue</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Cost</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Profit</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Margin</th>
-                    <th className="text-left py-3 px-4 font-semibold text-foreground">Stock</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {productData.map((product) => (
-                    <tr key={product.id} className="border-b border-border/50 hover:bg-muted/30">
-                      <td className="py-3 px-4 text-foreground font-medium">{product.name}</td>
-                      <td className="py-3 px-4 text-foreground">{formatCurrency(product.totalRevenue)}</td>
-                      <td className="py-3 px-4 text-muted-foreground">{formatCurrency(product.totalCost)}</td>
-                      <td className="py-3 px-4 text-success font-semibold">{formatCurrency(product.totalProfit)}</td>
-                      <td className="py-3 px-4">
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-success-light text-success">
-                          {product.profitMargin}%
-                        </span>
-                      </td>
-                      <td className="py-3 px-4 text-foreground">{formatNumber(product.stock_quantity || 0)}</td>
+              <>
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-border">
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Orders</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Revenue</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Campaign Spend</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Profit</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Performance</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {productData.map((product) => (
+                      <tr key={product.id} className="border-b border-border/50 hover:bg-muted/30">
+                        <td className="py-3 px-4 text-foreground font-medium">{product.name}</td>
+                        <td className="py-3 px-4 text-foreground">{formatNumber(product.orders || 0)}</td>
+                        <td className="py-3 px-4 text-foreground">{formatCurrency(product.revenue || 0)}</td>
+                        <td className="py-3 px-4 text-foreground">{formatCurrency(product.campaignSpend || 0)}</td>
+                        <td className={`py-3 px-4 font-semibold ${product.profit < 0 ? "text-red-500" : "text-green-500"}`}>
+                          {formatCurrency(product.profit || 0)}
+                        </td>
+                        <td className={`py-3 px-4 font-semibold ${product.performance < 0 ? "text-red-500" : "text-green-500"}`}>
+                          {formatCurrency(product.performance || 0)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                
+                {/* Pagination */}
+                {pagination.totalPages > 1 && (
+                  <div className="flex items-center justify-between mt-4 pt-4 border-t">
+                    <div className="text-sm text-muted-foreground">
+                      Showing {((currentPage - 1) * pagination.limit) + 1} to {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total} products
+                    </div>
+                    <div className="flex gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                        disabled={currentPage === 1}
+                      >
+                        <ChevronLeft className="h-4 w-4 mr-1" />
+                        Previous
+                      </Button>
+                      <div className="flex items-center gap-1">
+                        {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
+                          .filter(page => {
+                            // Show first page, last page, current page, and pages around current
+                            return page === 1 || 
+                                   page === pagination.totalPages || 
+                                   (page >= currentPage - 1 && page <= currentPage + 1);
+                          })
+                          .map((page, index, array) => {
+                            // Add ellipsis
+                            const showEllipsisBefore = index > 0 && page - array[index - 1] > 1;
+                            return (
+                              <div key={page} className="flex items-center gap-1">
+                                {showEllipsisBefore && <span className="px-2">...</span>}
+                                <Button
+                                  variant={currentPage === page ? 'default' : 'outline'}
+                                  size="sm"
+                                  onClick={() => setCurrentPage(page)}
+                                  className="min-w-[40px]"
+                                >
+                                  {page}
+                                </Button>
+                              </div>
+                            );
+                          })}
+                      </div>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
+                        disabled={currentPage === pagination.totalPages}
+                      >
+                        Next
+                        <ChevronRight className="h-4 w-4 ml-1" />
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </>
             ) : (
               <div className="text-center py-8">
-                <DollarSign className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground">No product profitability data available</p>
+                <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
+                <p className="text-muted-foreground">No product performance data available</p>
               </div>
             )}
           </div>
         </CardContent>
       </Card>
-
     </div>
   );
 }

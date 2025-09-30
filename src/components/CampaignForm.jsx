@@ -36,19 +36,28 @@ const CampaignForm = ({ campaign = null, onSuccess, onCancel }) => {
   // Populate form if editing existing campaign
   useEffect(() => {
     if (campaign) {
+      // Handle both snake_case (from database) and camelCase (from transformed data)
+      const startDate = campaign.start_date || campaign.startDate
+      const endDate = campaign.end_date || campaign.endDate
+      const isActive = campaign.is_active !== undefined ? campaign.is_active : campaign.isActive ?? true
+      const campaignProducts = campaign.campaign_products || campaign.campaignProducts || []
+      
       setFormData({
         name: campaign.name || '',
         description: campaign.description || '',
         cost: campaign.cost?.toString() || '',
-        startDate: campaign.startDate ? new Date(campaign.startDate).toISOString().split('T')[0] : '',
-        endDate: campaign.endDate ? new Date(campaign.endDate).toISOString().split('T')[0] : '',
-        isActive: campaign.isActive ?? true,
-        productIds: campaign.campaignProducts?.map(cp => cp.productId) || []
+        startDate: startDate ? new Date(startDate).toISOString().split('T')[0] : '',
+        endDate: endDate ? new Date(endDate).toISOString().split('T')[0] : '',
+        isActive: isActive,
+        productIds: campaignProducts.map(cp => cp.product_id || cp.productId).filter(Boolean)
       })
       
       // Set selected products for display
-      if (campaign.campaignProducts) {
-        setSelectedProducts(campaign.campaignProducts.map(cp => cp.product))
+      if (campaignProducts.length > 0) {
+        const products = campaignProducts
+          .map(cp => cp.product)
+          .filter(Boolean)
+        setSelectedProducts(products)
       }
     }
   }, [campaign])

@@ -64,7 +64,14 @@ export default function Campaigns() {
     try {
       setDeleting(true);
       await campaignService.deleteCampaign(deleteDialog.campaign.id);
+      
+      // Invalidate campaigns queries
       queryClient.invalidateQueries({ queryKey: ['admin_campaigns'] });
+      
+      // Invalidate dashboard/analytics queries to refresh stats after campaign deletion
+      queryClient.invalidateQueries({ queryKey: ['dashboard'] });
+      queryClient.invalidateQueries({ queryKey: ['analytics'] });
+      
       setDeleteDialog({ isOpen: false, campaign: null });
     } catch (err) {
       console.error('Error deleting campaign:', err);
@@ -228,9 +235,9 @@ export default function Campaigns() {
                       </td>
                       <td className="py-4 px-6">
                         <div className="text-sm">
-                          {campaign.campaignProducts?.length > 0 ? (
+                          {((campaign.campaign_products || campaign.campaignProducts)?.length > 0) ? (
                             <div className="space-y-1">
-                              {campaign.campaignProducts.map((cp, index) => (
+                              {(campaign.campaign_products || campaign.campaignProducts).map((cp, index) => (
                                 <div key={index} className="text-foreground">
                                   {cp.product?.name || 'Unknown Product'}
                                 </div>
@@ -253,14 +260,14 @@ export default function Campaigns() {
                       </td>
                       <td className="py-4 px-6">
                         <div className="text-sm">
-                          <div className="text-foreground">{formatDate(campaign.startDate)}</div>
+                          <div className="text-foreground">{formatDate(campaign.start_date || campaign.startDate)}</div>
                           <div className="text-muted-foreground">
-                            {campaign.endDate ? `to ${formatDate(campaign.endDate)}` : 'Ongoing'}
+                            {(campaign.end_date || campaign.endDate) ? `to ${formatDate(campaign.end_date || campaign.endDate)}` : 'Ongoing'}
                           </div>
                         </div>
                       </td>
                       <td className="py-4 px-6">
-                        {getStatusBadge(campaign.isActive, campaign.endDate)}
+                        {getStatusBadge(campaign.is_active !== undefined ? campaign.is_active : campaign.isActive, campaign.end_date || campaign.endDate)}
                       </td>
                       <td className="py-4 px-6">
                         <div className="flex gap-2">
