@@ -102,7 +102,7 @@ export default function Campaigns() {
     if (!isActive) {
       return (
         <Badge variant="secondary" className="bg-muted text-muted-foreground">
-          Inactive
+          Inactif
         </Badge>
       );
     }
@@ -110,14 +110,14 @@ export default function Campaigns() {
     if (endDate && new Date(endDate) < new Date()) {
       return (
         <Badge variant="secondary" className="bg-muted text-muted-foreground">
-          Completed
+          Terminé
         </Badge>
       );
     }
 
     return (
       <Badge variant="secondary" className="bg-green-100 text-green-800">
-        Active
+          Actif
       </Badge>
     );
   };
@@ -132,7 +132,7 @@ export default function Campaigns() {
       <div className="flex items-center justify-center h-64">
         <div className="flex items-center gap-2">
           <Loader2 className="w-6 h-6 animate-spin" />
-          <span>Loading campaigns...</span>
+          <span>Chargement des campagnes...</span>
         </div>
       </div>
     );
@@ -143,9 +143,9 @@ export default function Campaigns() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Campaigns</h1>
+          <h1 className="text-3xl font-bold text-foreground">Campagnes</h1>
           <p className="text-muted-foreground mt-2">
-            Manage marketing campaigns
+            Gérez vos campagnes marketing
           </p>
         </div>
         <div className="flex gap-2">
@@ -153,17 +153,17 @@ export default function Campaigns() {
             variant="outline"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-2"
+            className="flex items-center gap-2 text-white"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+            Actualiser
           </Button>
           <Button 
             onClick={handleCreateCampaign}
             className="bg-primary hover:bg-primary-hover text-primary-foreground"
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Campaign
+            Ajouter une Campagne
           </Button>
         </div>
       </div>
@@ -177,19 +177,15 @@ export default function Campaigns() {
       )}
 
       {/* Search */}
-      <Card>
-        <CardContent className="pt-6">
           <div className="relative w-96">
             <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search campaigns..."
+              placeholder="Rechercher des campagnes..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
           </div>
-        </CardContent>
-      </Card>
 
       {/* Campaigns Table */}
       <Card>
@@ -197,7 +193,7 @@ export default function Campaigns() {
           {filteredCampaigns.length === 0 ? (
             <div className="text-center py-12">
               <div className="text-muted-foreground">
-                {searchTerm ? 'No campaigns found matching your search.' : 'No campaigns created yet.'}
+                {searchTerm ? 'Aucune campagne trouvée correspondant à votre recherche.' : 'Aucune campagne créée pour le moment.'}
               </div>
               {!searchTerm && (
                 <Button 
@@ -205,7 +201,7 @@ export default function Campaigns() {
                   className="mt-4 bg-primary hover:bg-primary-hover text-primary-foreground"
                 >
                   <Plus className="w-4 h-4 mr-2" />
-                  Create Your First Campaign
+                  Créer Votre Première Campagne
                 </Button>
               )}
             </div>
@@ -214,11 +210,11 @@ export default function Campaigns() {
               <table className="w-full">
                 <thead>
                   <tr className="border-b border-border">
-                    <th className="text-left py-4 px-6 font-semibold text-foreground">Campaign Name</th>
-                    <th className="text-left py-4 px-6 font-semibold text-foreground">Products</th>
-                    <th className="text-left py-4 px-6 font-semibold text-foreground">Price</th>
-                    <th className="text-left py-4 px-6 font-semibold text-foreground">Duration</th>
-                    <th className="text-left py-4 px-6 font-semibold text-foreground">Status</th>
+                    <th className="text-left py-4 px-6 font-semibold text-foreground">Nom de la Campagne</th>
+                    <th className="text-left py-4 px-6 font-semibold text-foreground">Produits</th>
+                    <th className="text-left py-4 px-6 font-semibold text-foreground">Prix</th>
+                    <th className="text-left py-4 px-6 font-semibold text-foreground">Durée</th>
+                    <th className="text-left py-4 px-6 font-semibold text-foreground">Statut</th>
                     <th className="text-left py-4 px-6 font-semibold text-foreground">Actions</th>
                   </tr>
                 </thead>
@@ -244,7 +240,7 @@ export default function Campaigns() {
                               ))}
                             </div>
                           ) : (
-                            <span className="text-muted-foreground">No products linked</span>
+                            <span className="text-muted-foreground">Aucun produit lié</span>
                           )}
                         </div>
                       </td>
@@ -254,7 +250,7 @@ export default function Campaigns() {
                         </div>
                         {campaign.budget && (
                           <div className="text-sm text-muted-foreground">
-                            Budget: ${parseFloat(campaign.budget).toLocaleString()}
+                            Budget : ${parseFloat(campaign.budget).toLocaleString()}
                           </div>
                         )}
                       </td>
@@ -262,7 +258,7 @@ export default function Campaigns() {
                         <div className="text-sm">
                           <div className="text-foreground">{formatDate(campaign.start_date || campaign.startDate)}</div>
                           <div className="text-muted-foreground">
-                            {(campaign.end_date || campaign.endDate) ? `to ${formatDate(campaign.end_date || campaign.endDate)}` : 'Ongoing'}
+                            {(campaign.end_date || campaign.endDate) ? `au ${formatDate(campaign.end_date || campaign.endDate)}` : 'En cours'}
                           </div>
                         </div>
                       </td>
@@ -275,7 +271,7 @@ export default function Campaigns() {
                             variant="ghost" 
                             size="sm"
                             onClick={() => handleEditCampaign(campaign)}
-                            title="Edit Campaign"
+                            title="Modifier la campagne"
                           >
                             <Edit className="w-4 h-4" />
                           </Button>
@@ -284,7 +280,7 @@ export default function Campaigns() {
                             size="sm" 
                             className="text-destructive hover:text-destructive"
                             onClick={() => handleDeleteCampaign(campaign)}
-                            title="Delete Campaign"
+                            title="Supprimer la campagne"
                           >
                             <Trash2 className="w-4 h-4" />
                           </Button>
@@ -311,9 +307,9 @@ export default function Campaigns() {
       <Dialog open={deleteDialog.isOpen} onOpenChange={() => setDeleteDialog({ isOpen: false, campaign: null })}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Delete Campaign</DialogTitle>
+            <DialogTitle>Supprimer la Campagne</DialogTitle>
             <DialogDescription>
-              Are you sure you want to delete "{deleteDialog.campaign?.name}"? This action cannot be undone.
+              Êtes-vous sûr de vouloir supprimer "{deleteDialog.campaign?.name}" ? Cette action ne peut pas être annulée.
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
@@ -322,7 +318,7 @@ export default function Campaigns() {
               onClick={() => setDeleteDialog({ isOpen: false, campaign: null })}
               disabled={deleting}
             >
-              Cancel
+              Annuler
             </Button>
             <Button
               variant="destructive"
@@ -332,10 +328,10 @@ export default function Campaigns() {
               {deleting ? (
                 <>
                   <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                  Deleting...
+                  Suppression...
                 </>
               ) : (
-                'Delete'
+                'Supprimer'
               )}
             </Button>
           </DialogFooter>

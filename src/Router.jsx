@@ -7,6 +7,7 @@ import AdminLayout from "./layouts/adminLayout";
 // Context
 import { AuthProvider } from "./contexts/AuthContext";
 import ProtectedRoute from "./components/ProtectedRoute";
+import ScrollToTop from "./components/ScrollToTop";
 
 // Shop pages
 import Home from "./pages/shop/Home";
@@ -28,6 +29,7 @@ import NotFound from "./pages/NotFound";
 export default function Router() {
   return (
     <AuthProvider>
+      <ScrollToTop />
       <Routes>
         {/* Shop Routes */}
         <Route element={<ShopLayout />}>

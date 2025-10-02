@@ -64,8 +64,8 @@ export default function POS() {
     // Check stock availability
     if (product.stock_quantity <= 0) {
       toast({
-        title: "Out of Stock",
-        description: `${product.name} is currently out of stock`,
+        title: "Rupture de Stock",
+        description: `${product.name} est actuellement en rupture de stock`,
         variant: "destructive",
       });
       return;
@@ -77,8 +77,8 @@ export default function POS() {
         // Check if adding one more would exceed stock
         if (existing.quantity >= product.stock_quantity) {
           toast({
-            title: "Insufficient Stock",
-            description: `Only ${product.stock_quantity} units available`,
+            title: "Stock Insuffisant",
+            description: `Seulement ${product.stock_quantity} unités disponibles`,
             variant: "destructive",
           });
           return prev;
@@ -101,8 +101,8 @@ export default function POS() {
       const product = products.find(p => p.id === id);
       if (product && quantity > product.stock_quantity) {
         toast({
-          title: "Insufficient Stock",
-          description: `Only ${product.stock_quantity} units available`,
+          title: "Stock Insuffisant",
+          description: `Seulement ${product.stock_quantity} unités disponibles`,
           variant: "destructive",
         });
         return;
@@ -142,8 +142,8 @@ export default function POS() {
   const processOrder = async () => {
     if (cart.length === 0) {
       toast({
-        title: "Empty Cart",
-        description: "Please add items to cart before processing order",
+        title: "Panier Vide",
+        description: "Veuillez ajouter des articles au panier avant de traiter la commande",
         variant: "destructive",
       });
       return;
@@ -174,8 +174,8 @@ export default function POS() {
       const response = await createOrder(orderData);
       
       toast({
-        title: "Order Processed Successfully",
-        description: `Order #${response.data.orderNumber} created for ${customerInfo.name}`,
+        title: "Commande Traitée avec Succès",
+        description: `Commande #${response.data.orderNumber} créée pour ${customerInfo.name}`,
       });
       
       setOrderSuccess(true);
@@ -192,8 +192,8 @@ export default function POS() {
     } catch (error) {
       console.error('Error processing order:', error);
       toast({
-        title: "Order Failed",
-        description: error.response?.data?.message || "Failed to process order",
+        title: "Échec de la Commande",
+        description: error.response?.data?.message || "Échec du traitement de la commande",
         variant: "destructive",
       });
     } finally {
@@ -206,19 +206,19 @@ export default function POS() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Point of Sale (POS)</h1>
+          <h1 className="text-3xl font-bold text-foreground">Point de Vente (PDV)</h1>
           <p className="text-muted-foreground mt-2">
-            Create orders for in-store customers
+            Créez des commandes pour les clients en magasin
           </p>
         </div>
         <Button 
           variant="outline"
           onClick={handleRefresh}
           disabled={isRefreshing}
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 text-white"
         >
-          <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-          Refresh Products
+          <RefreshCw className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+          Actualiser les Produits
         </Button>
       </div>
 
@@ -227,12 +227,12 @@ export default function POS() {
         <div className="lg:col-span-2 space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Available Products</CardTitle>
+              <CardTitle>Produits Disponibles</CardTitle>
               <div className="flex gap-4 mt-4">
                 <div className="relative flex-1">
                   <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <Input
-                    placeholder="Search products..."
+                    placeholder="Rechercher des produits..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
                     className="pl-10"
@@ -244,7 +244,7 @@ export default function POS() {
                   className="flex items-center gap-2"
                 >
                   <QrCode className="w-4 h-4" />
-                  Scan QR Code
+                  Scanner le QR Code
                 </Button>
               </div>
             </CardHeader>
@@ -252,11 +252,11 @@ export default function POS() {
               {productsLoading ? (
                 <div className="text-center py-8">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
-                  <p className="text-muted-foreground mt-2">Loading products...</p>
+                  <p className="text-muted-foreground mt-2">Chargement des produits...</p>
                 </div>
               ) : products.length === 0 ? (
                 <div className="text-center py-8">
-                  <p className="text-muted-foreground">No products found</p>
+                  <p className="text-muted-foreground">Aucun produit trouvé</p>
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -279,13 +279,13 @@ export default function POS() {
                           <div className="w-full h-full hidden items-center justify-center bg-muted text-muted-foreground text-xs">
                             <div className="text-center">
                               <div className="w-6 h-6 mx-auto mb-1">📦</div>
-                              No Image
+                              Pas d'image
                             </div>
                           </div>
                         </div>
                         <div className="flex-1">
                           <h3 className="font-medium text-foreground">{product.name}</h3>
-                          <p className="text-sm text-muted-foreground">{product.category?.name || 'Uncategorized'}</p>
+                          <p className="text-sm text-muted-foreground">{product.category?.name || 'Sans catégorie'}</p>
                           <p className="text-sm text-muted-foreground">SKU: {product.sku || 'N/A'}</p>
                         </div>
                       </div>
@@ -305,7 +305,7 @@ export default function POS() {
                                 : 'bg-destructive-light text-destructive'
                             }`}
                           >
-                            {product.stock_quantity} in stock
+                            {product.stock_quantity} en stock
                           </Badge>
                         </div>
                         <Button
@@ -315,7 +315,7 @@ export default function POS() {
                           disabled={product.stock_quantity <= 0}
                         >
                           <Plus className="w-4 h-4 mr-1" />
-                          Add
+                          Ajouter
                         </Button>
                       </div>
                     </div>
@@ -347,9 +347,9 @@ export default function POS() {
           <Card>
             <CardHeader>
               <div className="flex justify-between items-center">
-                <CardTitle>Shopping Cart</CardTitle>
+                <CardTitle>Panier</CardTitle>
                 <Badge variant="secondary" className="bg-primary-light text-primary">
-                  {cart.length} items
+                  {cart.length} articles
                 </Badge>
               </div>
             </CardHeader>
@@ -357,7 +357,7 @@ export default function POS() {
               {cart.length === 0 ? (
                 <div className="text-center py-8">
                   <ShoppingCart className="w-12 h-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">Cart is empty</p>
+                  <p className="text-muted-foreground">Le panier est vide</p>
                 </div>
               ) : (
                 <div className="space-y-4">
@@ -431,33 +431,33 @@ export default function POS() {
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Calculator className="w-5 h-5" />
-                  Order Summary
+                  Résumé de la Commande
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-4">
                 {/* Customer Info Display */}
                 <div className="bg-muted/50 rounded-lg p-3 space-y-1">
-                  <h4 className="font-medium text-sm text-muted-foreground">Customer Information</h4>
+                  <h4 className="font-medium text-sm text-muted-foreground">Informations Client</h4>
                   <div className="text-sm">
-                    <p><span className="font-medium">Name:</span> {customerInfo.name}</p>
-                    <p><span className="font-medium">Location:</span> {customerInfo.wilaya}, {customerInfo.baladiya}</p>
-                    <p><span className="font-medium">Order Type:</span> In-Store POS</p>
+                    <p><span className="font-medium">Nom :</span> {customerInfo.name}</p>
+                    <p><span className="font-medium">Localisation :</span> {customerInfo.wilaya}, {customerInfo.baladiya}</p>
+                    <p><span className="font-medium">Type de commande :</span> PDV en magasin</p>
                   </div>
                 </div>
 
                 {/* Pricing Breakdown */}
                 <div className="space-y-2">
                   <div className="flex justify-between text-foreground">
-                    <span>Subtotal:</span>
+                    <span>Sous-total :</span>
                     <span>${subtotal.toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-foreground">
-                    <span>Delivery Fee:</span>
-                    <span className="text-success">$0.00 (In-Store)</span>
+                    <span>Frais de livraison :</span>
+                    <span className="text-success">$0.00 (En magasin)</span>
                   </div>
                   <div className="border-t border-border pt-2">
                     <div className="flex justify-between text-lg font-semibold text-foreground">
-                      <span>Total:</span>
+                      <span>Total :</span>
                       <span>${total.toFixed(2)}</span>
                     </div>
                   </div>
@@ -474,14 +474,14 @@ export default function POS() {
                     {isProcessing ? (
                       <>
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Processing...
+                        Traitement en cours...
                       </>
                     ) : (
-                      'Process Order'
+                      'Traiter la Commande'
                     )}
                   </Button>
                   <Button onClick={clearCart} variant="outline" className="w-full" disabled={isProcessing}>
-                    Clear Cart
+                    Vider le Panier
                   </Button>
                 </div>
               </CardContent>

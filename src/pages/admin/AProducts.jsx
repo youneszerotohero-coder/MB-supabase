@@ -146,9 +146,9 @@ export default function AProducts() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Products</h1>
+          <h1 className="text-3xl font-bold text-foreground">Produits</h1>
           <p className="text-muted-foreground mt-2">
-            Manage your product catalog and categories
+            Gérez votre catalogue de produits et vos catégories
           </p>
         </div>
         <div className="flex gap-3">
@@ -156,17 +156,17 @@ export default function AProducts() {
             variant="outline"
             onClick={handleRefresh}
             disabled={isRefreshing}
-            className="flex items-center gap-2"
+            className="text-white flex items-center gap-2"
           >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+            <RefreshCw className={`w-4 h-4 text-white ${isRefreshing ? 'animate-spin' : ''}`} />
+            Actualiser
           </Button>
           <Button 
             className="bg-primary hover:bg-primary-hover text-primary-foreground"
             onClick={() => setAddProductOpen(true)}
           >
             <Plus className="w-4 h-4 mr-2" />
-            Add Product
+            Ajouter un Produit
           </Button>
         </div>
       </div>
@@ -174,8 +174,8 @@ export default function AProducts() {
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList className="grid w-full grid-cols-2 lg:w-96">
-          <TabsTrigger value="categories">Categories</TabsTrigger>
-          <TabsTrigger value="products">Products</TabsTrigger>
+          <TabsTrigger value="categories">Catégories</TabsTrigger>
+          <TabsTrigger value="products">Produits</TabsTrigger>
         </TabsList>
 
         {/* Categories Tab */}
@@ -184,7 +184,7 @@ export default function AProducts() {
             <div className="relative w-96">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search categories..."
+                placeholder="Rechercher des catégories..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-10"
@@ -193,7 +193,7 @@ export default function AProducts() {
                 <button
                   onClick={() => setSearchTerm("")}
                   className="absolute right-3 top-3 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
-                  title="Clear search"
+                  title="Effacer la recherche"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -202,15 +202,16 @@ export default function AProducts() {
             <div className="flex items-center gap-4">
               {searchTerm && (
                 <div className="text-sm text-muted-foreground">
-                  Found {categories.length} of {allCategories.length} categories
+                  Trouvé {categories.length} sur {allCategories.length} catégories
                 </div>
               )}
               <Button 
+              className="text-white"
                 variant="outline"
                 onClick={() => setAddCategoryOpen(true)}
               >
-                <Plus className="w-4 h-4 mr-2" />
-                Add Category
+                <Plus className="w-4 h-4 text-white mr-2" />
+                Ajouter une Catégorie
               </Button>
             </div>
           </div>
@@ -219,11 +220,11 @@ export default function AProducts() {
             {categories.length === 0 ? (
               <div className="col-span-full flex flex-col items-center justify-center py-12">
                 <div className="text-center">
-                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">No categories found</h3>
-                  <p className="text-sm text-muted-foreground mb-4">Start by creating your first category</p>
+                  <h3 className="text-lg font-semibold text-muted-foreground mb-2">Aucune catégorie trouvée</h3>
+                  <p className="text-sm text-muted-foreground mb-4">Commencez par créer votre première catégorie</p>
                   <Button onClick={() => setAddCategoryOpen(true)} variant="outline">
                     <Plus className="w-4 h-4 mr-2" />
-                    Create Category
+                    Créer une Catégorie
                   </Button>
                 </div>
               </div>
@@ -238,7 +239,7 @@ export default function AProducts() {
                           variant="ghost" 
                           size="sm"
                           onClick={() => handleEditCategory(category)}
-                          title="Edit category"
+                          title="Modifier la catégorie"
                         >
                           <Edit className="w-4 h-4" />
                         </Button>
@@ -247,7 +248,7 @@ export default function AProducts() {
                           size="sm" 
                           className="text-destructive hover:text-destructive"
                           onClick={() => handleDeleteCategory(category)}
-                          title="Delete category"
+                          title="Supprimer la catégorie"
                         >
                           <Trash2 className="w-4 h-4" />
                         </Button>
@@ -255,12 +256,12 @@ export default function AProducts() {
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="flex justify-between items-center">
+                    <div className="flex justify-between items-center px-6 mb-6">
                       <span className="text-sm text-muted-foreground">
-                        {category._count?.products || category.productCount || 0} products
+                        {category.productCount || 0} produits
                       </span>
-                      <Badge variant="secondary" className={category.isActive ? "bg-success-light text-success" : ""}>
-                        {category.isActive ? 'Active' : 'Inactive'}
+                      <Badge variant="secondary" className="bg-success-light text-success">
+                        Actif
                       </Badge>
                     </div>
                   </CardContent>
@@ -276,7 +277,7 @@ export default function AProducts() {
             <div className="relative w-96">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search products by name, brand, category, or SKU..."
+                placeholder="Rechercher des produits par nom, marque, catégorie ou SKU..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-10"
@@ -285,7 +286,7 @@ export default function AProducts() {
                 <button
                   onClick={() => setSearchTerm("")}
                   className="absolute right-3 top-3 h-4 w-4 text-muted-foreground hover:text-foreground transition-colors"
-                  title="Clear search"
+                  title="Effacer la recherche"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -294,7 +295,7 @@ export default function AProducts() {
             <div className="text-sm text-muted-foreground">
               {searchTerm && (
                 <span>
-                  Found {products.length} of {allProducts.length} products
+                  Trouvé {products.length} sur {allProducts.length} produits
                 </span>
               )}
             </div>
@@ -306,13 +307,13 @@ export default function AProducts() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Product</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Category</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Price/Cost</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Profit</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Produit</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Catégorie</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Prix/Coût</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Bénéfice</th>
                       <th className="text-left py-4 px-6 font-semibold text-foreground">Stock</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Variants</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Status</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Variantes</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Statut</th>
                       <th className="text-left py-4 px-6 font-semibold text-foreground">Actions</th>
                     </tr>
                   </thead>
@@ -320,13 +321,13 @@ export default function AProducts() {
                     {isLoading ? (
                       <tr>
                         <td colSpan="8" className="py-8 text-center text-muted-foreground">
-                          Loading products...
+                          Chargement des produits...
                         </td>
                       </tr>
                     ) : products.length === 0 ? (
                       <tr>
                         <td colSpan="8" className="py-8 text-center text-muted-foreground">
-                          {searchTerm ? `No products found matching "${searchTerm}"` : "No products found. Create your first product to get started."}
+                          {searchTerm ? `Aucun produit trouvé correspondant à "${searchTerm}"` : "Aucun produit trouvé. Créez votre premier produit pour commencer."}
                         </td>
                       </tr>
                     ) : (
@@ -349,11 +350,11 @@ export default function AProducts() {
                             </div>
                             <div>
                               <div className="font-medium text-foreground">{product.name}</div>
-                              <div className="text-sm text-muted-foreground">{product.slug || 'No slug'}</div>
+                              <div className="text-sm text-muted-foreground">{product.slug || 'Pas de slug'}</div>
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-6 text-foreground">{product.category?.name || 'Uncategorized'}</td>
+                        <td className="py-4 px-6 text-foreground">{product.category?.name || 'Sans catégorie'}</td>
                         <td className="py-4 px-6">
                           <div className="text-foreground font-medium">${product.price}</div>
                           <div className="text-sm text-muted-foreground">${product.cost || '0.00'}</div>
@@ -369,10 +370,10 @@ export default function AProducts() {
                         <td className="py-4 px-6">
                           <div className="space-y-1">
                             <div className="text-xs text-muted-foreground">
-                              Colors: {(product.colors || []).map(c => c.name || c).join(", ") || "None"}
+                              Couleurs: {(product.colors || []).map(c => c.name || c).join(", ") || "Aucune"}
                             </div>
                             <div className="text-xs text-muted-foreground">
-                              Sizes: {(product.sizes || []).map(s => s.value || s).join(", ") || "None"}
+                              Tailles: {(product.sizes || []).map(s => s.value || s).join(", ") || "Aucune"}
                             </div>
                           </div>
                         </td>
@@ -385,7 +386,7 @@ export default function AProducts() {
                                 : 'bg-warning-light text-warning'
                             }`}
                           >
-                            {product.stock_quantity > 0 ? 'In Stock' : 'Out of Stock'}
+                            {product.stock_quantity > 0 ? 'En Stock' : 'Rupture de Stock'}
                           </Badge>
                         </td>
                         <td className="py-4 px-6">
@@ -394,7 +395,7 @@ export default function AProducts() {
                               variant="ghost" 
                               size="sm"
                               onClick={() => handleEditProduct(product)}
-                              title="Edit product"
+                              title="Modifier le produit"
                             >
                               <Edit className="w-4 h-4" />
                             </Button>
@@ -402,7 +403,7 @@ export default function AProducts() {
                               variant="ghost" 
                               size="sm"
                               onClick={() => handleQRCode(product)}
-                              title="Generate QR Code"
+                              title="Générer un QR Code"
                             >
                               <QrCode className="w-4 h-4" />
                             </Button>
@@ -411,7 +412,7 @@ export default function AProducts() {
                               size="sm" 
                               className="text-destructive hover:text-destructive"
                               onClick={() => handleDeleteProduct(product)}
-                              title="Delete product"
+                              title="Supprimer le produit"
                             >
                               <Trash2 className="w-4 h-4" />
                             </Button>

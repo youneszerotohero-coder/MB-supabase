@@ -1,6 +1,8 @@
 import { Star, Instagram, Facebook, Twitter, Mail, Phone, MapPin } from "lucide-react";
+import { useTranslation } from "react-i18next";
 
 export default function Footer() {
+  const { t } = useTranslation();
   return (
     <footer className="bg-[#F8F5F0] text-neutral-800" id="contact">
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
@@ -11,7 +13,7 @@ export default function Footer() {
               Mouad Boutique
             </h3>
             <p className="text-neutral-700 mb-6 leading-relaxed">
-              Crafting timeless elegance through premium handbags that complement your lifestyle and express your unique style.
+              {t('footer.description')}
             </p>
             <div className="flex space-x-3">
               <a
@@ -38,32 +40,32 @@ export default function Footer() {
           {/* Quick Links */}
           <div className="lg:ml-12">
             <h4 className="font-serif text-lg font-semibold text-[#C8B28D] mb-4">
-              Quick Links
+              {t('footer.quickLinks')}
             </h4>
             <ul className="space-y-3">
               <li>
                 <a href="#shop" className="hover:text-[#C8B28D] transition">
-                  Shop
+                  {t('footer.shop')}
                 </a>
               </li>
               <li>
                 <a href="#collections" className="hover:text-[#C8B28D] transition">
-                  Collections
+                  {t('footer.collections')}
                 </a>
               </li>
               <li>
                 <a href="#about" className="hover:text-[#C8B28D] transition">
-                  About Us
+                  {t('footer.aboutUs')}
                 </a>
               </li>
               <li>
                 <a href="#contact" className="hover:text-[#C8B28D] transition">
-                  Contact
+                  {t('footer.contact')}
                 </a>
               </li>
               <li>
                 <a href="#faq" className="hover:text-[#C8B28D] transition">
-                  FAQ
+                  {t('footer.faq')}
                 </a>
               </li>
             </ul>
@@ -72,21 +74,21 @@ export default function Footer() {
           {/* Customer Service */}
           <div>
             <h4 className="font-serif text-lg font-semibold text-[#C8B28D] mb-4">
-              Customer Service
+              {t('footer.customerService')}
             </h4>
             <ul className="space-y-3">
-              <li><a href="#" className="hover:text-[#C8B28D] transition">Shipping Info</a></li>
-              <li><a href="#" className="hover:text-[#C8B28D] transition">Returns & Exchanges</a></li>
-              <li><a href="#" className="hover:text-[#C8B28D] transition">Size Guide</a></li>
-              <li><a href="#" className="hover:text-[#C8B28D] transition">Care Instructions</a></li>
-              <li><a href="#" className="hover:text-[#C8B28D] transition">Privacy Policy</a></li>
+              <li><a href="#" className="hover:text-[#C8B28D] transition">{t('footer.shippingInfo')}</a></li>
+              <li><a href="#" className="hover:text-[#C8B28D] transition">{t('footer.returnsExchanges')}</a></li>
+              <li><a href="#" className="hover:text-[#C8B28D] transition">{t('footer.sizeGuide')}</a></li>
+              <li><a href="#" className="hover:text-[#C8B28D] transition">{t('footer.careInstructions')}</a></li>
+              <li><a href="#" className="hover:text-[#C8B28D] transition">{t('footer.privacyPolicy')}</a></li>
             </ul>
           </div>
 
           {/* Contact Info */}
           <div>
             <h4 className="font-serif text-lg font-semibold text-[#C8B28D] mb-4">
-              Get in Touch
+              {t('footer.getInTouch')}
             </h4>
             <div className="space-y-4 text-neutral-700">
               <div className="flex items-center space-x-3">
@@ -108,9 +110,9 @@ export default function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-neutral-300 mt-12 pt-8 text-center">
           <p className="text-sm text-neutral-600">
-            ©2025 Mouad Boutique. All rights reserved. |{" "}
-            <a href="#" className="hover:text-[#C8B28D] transition">Terms of Service</a> |{" "}
-            <a href="#" className="hover:text-[#C8B28D] transition">Privacy Policy</a>
+            ©2025 Mouad Boutique. {t('footer.allRightsReserved')} |{" "}
+            <a href="#" className="hover:text-[#C8B28D] transition">{t('footer.termsOfService')}</a> |{" "}
+            <a href="#" className="hover:text-[#C8B28D] transition">{t('footer.privacyPolicy')}</a>
           </p>
         </div>
       </section>

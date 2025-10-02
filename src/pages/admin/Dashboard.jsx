@@ -32,7 +32,7 @@ import {
 const formatCurrency = (amount) => {
   return new Intl.NumberFormat('en-US', {
     style: 'currency',
-    currency: 'USD'
+    currency: 'dzd'
   }).format(amount);
 };
 
@@ -141,33 +141,33 @@ export default function Dashboard() {
     
     return [
       {
-        name: "Total Revenue",
+        name: "Revenu Total",
         value: formatCurrency(dashboardData.revenue || 0),
         breakdown: [
-          { label: "Online", value: formatCurrency(dashboardData.onlineRevenue || 0), icon: Globe },
-          { label: "In-Store", value: formatCurrency(dashboardData.instoreRevenue || 0), icon: Store }
+          { label: "En ligne", value: formatCurrency(dashboardData.onlineRevenue || 0), icon: Globe },
+          { label: "En magasin", value: formatCurrency(dashboardData.instoreRevenue || 0), icon: Store }
         ],
         icon: DollarSign,
         color: "bg-blue-500"
       },
       {
-        name: "Total Profit",
+        name: "Bénéfice Total",
         value: formatCurrency(dashboardData.netProfit || 0),
         breakdown: [
-          { label: "Online", value: formatCurrency(dashboardData.onlineProfit || 0), icon: Globe },
-          { label: "In-Store", value: formatCurrency(dashboardData.instoreProfit || 0), icon: Store }
+          { label: "En ligne", value: formatCurrency(dashboardData.onlineProfit || 0), icon: Globe },
+          { label: "En magasin", value: formatCurrency(dashboardData.instoreProfit || 0), icon: Store }
         ],
         icon: TrendingUp,
         color: "bg-green-500"
       },
       {
-        name: "Stock Value",
+        name: "Valeur du Stock",
         value: formatCurrency(dashboardData.stockValue || 0),
         icon: Package,
         color: "bg-purple-500"
       },
       {
-        name: "Campaign Spend",
+        name: "Dépenses Campagnes",
         value: formatCurrency(dashboardData.campaignSpend || 0),
         icon: Megaphone,
         color: "bg-orange-500"
@@ -213,7 +213,7 @@ export default function Dashboard() {
         <div className="flex items-center justify-center h-64">
           <div className="flex items-center space-x-2">
             <RefreshCw className="h-6 w-6 animate-spin" />
-            <span>Loading dashboard data...</span>
+            <span>Chargement des données...</span>
           </div>
         </div>
       </div>
@@ -240,34 +240,37 @@ export default function Dashboard() {
       {/* Header */}
       <div className="flex justify-between items-start">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
+          <h1 className="text-3xl font-bold text-foreground">Tableau de Bord</h1>
           <p className="text-muted-foreground mt-2">
-            Overview of your e-commerce performance
+            Aperçu de la performance de votre e-commerce
           </p>
         </div>
         <div className="flex items-center gap-2">
           {/* Period Toggle */}
           <div className="flex gap-2 bg-muted p-1 rounded-lg">
             <Button
+            className="text-white"
               variant={period === 'daily' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setPeriod('daily')}
             >
-              Day
+              Jour
             </Button>
             <Button
+            className="text-white"
               variant={period === 'weekly' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setPeriod('weekly')}
             >
-              Week
+              Semaine
             </Button>
             <Button
+            className="text-white"
               variant={period === 'monthly' ? 'default' : 'ghost'}
               size="sm"
               onClick={() => setPeriod('monthly')}
             >
-              Month
+              Mois
             </Button>
           </div>
           
@@ -279,7 +282,7 @@ export default function Dashboard() {
             size="icon"
             title="Refresh data"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`h-4 w-4 text-white ${loading ? 'animate-spin' : ''}`} />
           </Button>
         </div>
       </div>
@@ -297,11 +300,11 @@ export default function Dashboard() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-foreground">{stat.value}</div>
+              <div className="text-2xl font-bold text-foreground ml-3">{stat.value}</div>
               
               {/* Breakdown for Revenue and Profit */}
               {stat.breakdown && (
-                <div className="mt-3 space-y-2 pt-3 border-t">
+                <div className="mt-3 space-y-2 pt-3 border-t px-3">
                   {stat.breakdown.map((item, index) => (
                     <div key={index} className="flex items-center justify-between text-sm">
                       <div className="flex items-center gap-1.5 text-muted-foreground">
@@ -322,9 +325,9 @@ export default function Dashboard() {
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader>
           <div>
-            <CardTitle className="text-foreground">Sales Analytics</CardTitle>
+            <CardTitle className="text-foreground">Analyse des Ventes</CardTitle>
             <p className="text-sm text-muted-foreground">
-              Campaign spend vs revenue vs profit over time
+              Dépenses campagnes vs revenus vs bénéfices dans le temps
             </p>
           </div>
         </CardHeader>
@@ -391,7 +394,7 @@ export default function Dashboard() {
               <div className="h-full flex items-center justify-center border-2 border-dashed border-muted rounded-lg">
                 <div className="text-center">
                   <TrendingUp className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                  <p className="text-muted-foreground">No chart data available</p>
+                  <p className="text-muted-foreground">Aucune donnée disponible</p>
                 </div>
               </div>
             )}
@@ -402,9 +405,9 @@ export default function Dashboard() {
       {/* Bottom Section - Products Table */}
       <Card className="hover:shadow-lg transition-shadow">
         <CardHeader>
-          <CardTitle className="text-foreground">Product Performance</CardTitle>
+          <CardTitle className="text-foreground">Performance des Produits</CardTitle>
           <p className="text-sm text-muted-foreground">
-            Profit = sales only • Performance = includes inventory investment
+            Bénéfice = ventes uniquement • Performance = inclut l'investissement en stock
           </p>
         </CardHeader>
         <CardContent>
@@ -414,11 +417,11 @@ export default function Dashboard() {
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-3 px-4 font-semibold text-foreground">Product</th>
-                      <th className="text-left py-3 px-4 font-semibold text-foreground">Orders</th>
-                      <th className="text-left py-3 px-4 font-semibold text-foreground">Revenue</th>
-                      <th className="text-left py-3 px-4 font-semibold text-foreground">Campaign Spend</th>
-                      <th className="text-left py-3 px-4 font-semibold text-foreground">Profit</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Produit</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Commandes</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Revenu</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Dépenses Campagnes</th>
+                      <th className="text-left py-3 px-4 font-semibold text-foreground">Bénéfice</th>
                       <th className="text-left py-3 px-4 font-semibold text-foreground">Performance</th>
                     </tr>
                   </thead>
@@ -444,7 +447,7 @@ export default function Dashboard() {
                 {pagination.totalPages > 1 && (
                   <div className="flex items-center justify-between mt-4 pt-4 border-t">
                     <div className="text-sm text-muted-foreground">
-                      Showing {((currentPage - 1) * pagination.limit) + 1} to {Math.min(currentPage * pagination.limit, pagination.total)} of {pagination.total} products
+                      Affichage de {((currentPage - 1) * pagination.limit) + 1} à {Math.min(currentPage * pagination.limit, pagination.total)} sur {pagination.total} produits
                     </div>
                     <div className="flex gap-2">
                       <Button
@@ -454,7 +457,7 @@ export default function Dashboard() {
                         disabled={currentPage === 1}
                       >
                         <ChevronLeft className="h-4 w-4 mr-1" />
-                        Previous
+                        Précédent
                       </Button>
                       <div className="flex items-center gap-1">
                         {Array.from({ length: pagination.totalPages }, (_, i) => i + 1)
@@ -488,7 +491,7 @@ export default function Dashboard() {
                         onClick={() => setCurrentPage(prev => Math.min(pagination.totalPages, prev + 1))}
                         disabled={currentPage === pagination.totalPages}
                       >
-                        Next
+                        Suivant
                         <ChevronRight className="h-4 w-4 ml-1" />
                       </Button>
                     </div>
@@ -498,7 +501,7 @@ export default function Dashboard() {
             ) : (
               <div className="text-center py-8">
                 <ShoppingCart className="h-12 w-12 text-muted-foreground mx-auto mb-2" />
-                <p className="text-muted-foreground">No product performance data available</p>
+                <p className="text-muted-foreground">Aucune donnée de performance produit disponible</p>
               </div>
             )}
           </div>

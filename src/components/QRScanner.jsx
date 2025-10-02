@@ -53,10 +53,10 @@ export function QRScanner({ open, onOpenChange, onProductFound, products = [] })
         return;
       }
 
-      if (!product.is_active || product.stock_quantity <= 0) {
+      if (product.stock_quantity <= 0) {
         toast({
           title: "Product Unavailable",
-          description: `${product.name} is currently out of stock or inactive`,
+          description: `${product.name} is currently out of stock`,
           variant: "destructive",
         });
         return;

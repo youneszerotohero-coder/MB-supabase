@@ -131,5 +131,24 @@
     "descriptionArabic": "Description (Arabe)",
     "descriptionEnglishPlaceholder": "Entrez la description du produit en anglais",
     "descriptionArabicPlaceholder": "أدخل وصف المنتج باللغة العربية"
-  }
+  },
+  "footer": {
+  "description": "Créer une élégance intemporelle à travers des sacs à main de luxe qui complètent votre style de vie et expriment votre personnalité unique.",
+  "quickLinks": "Liens rapides",
+  "shop": "Boutique",
+  "collections": "Collections",
+  "aboutUs": "À propos de nous",
+  "contact": "Contact",
+  "faq": "FAQ",
+  "customerService": "Service client",
+  "shippingInfo": "Informations sur la livraison",
+  "returnsExchanges": "Retours & Échanges",
+  "sizeGuide": "Guide des tailles",
+  "careInstructions": "Instructions d’entretien",
+  "privacyPolicy": "Politique de confidentialité",
+  "getInTouch": "Restez en contact",
+  "termsOfService": "Conditions d’utilisation",
+  "allRightsReserved": "Tous droits réservés"
+}
+
 }

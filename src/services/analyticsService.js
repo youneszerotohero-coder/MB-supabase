@@ -13,10 +13,12 @@ export const analyticsService = {
           startDate.setDate(endDate.getDate() - days);
           break;
         case 'weekly':
-          startDate.setDate(endDate.getDate() - (days * 7));
+          // days represents the total number of days to look back (e.g., 84 days = ~12 weeks)
+          startDate.setDate(endDate.getDate() - days);
           break;
         case 'monthly':
-          startDate.setMonth(endDate.getMonth() - days);
+          // days represents the total number of days to look back (e.g., 365 days = ~12 months)
+          startDate.setDate(endDate.getDate() - days);
           break;
         default:
           startDate.setDate(endDate.getDate() - 30);

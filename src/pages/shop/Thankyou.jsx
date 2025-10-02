@@ -102,7 +102,7 @@ export default function ThankYou() {
                     <p className="text-sm text-gray-500">{t('thankyou.qty')}: {orderData.quantity}</p>
                   </div>
                   <div className="text-right">
-                    <p className="font-medium text-gray-900">${orderData.total}</p>
+                    <p className="font-medium text-gray-900">{orderData.total} DZD</p>
                     <p className="text-sm text-gray-500">{t('checkout.total')}</p>
                   </div>
                 </div>
@@ -113,7 +113,7 @@ export default function ThankYou() {
                 <div className="border-t border-gray-200 pt-3">
                   <div className="flex justify-between text-lg font-semibold text-gray-900">
                     <span>{t('thankyou.totalPaid')}</span>
-                    <span style={{ color: '#C8B28D' }}>${orderData.total}</span>
+                    <span style={{ color: '#C8B28D' }}>{orderData.total} DZD</span>
                   </div>
                 </div>
               </div>

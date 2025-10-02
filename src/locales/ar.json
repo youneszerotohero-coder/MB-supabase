@@ -131,5 +131,24 @@
     "descriptionArabic": "الوصف (العربية)",
     "descriptionEnglishPlaceholder": "Enter product description in English",
     "descriptionArabicPlaceholder": "أدخل وصف المنتج باللغة العربية"
-  }
+  },
+  "footer": {
+  "description": "نصنع أناقة خالدة من خلال حقائب فاخرة تُكمل أسلوب حياتك وتعبر عن أسلوبك الفريد.",
+  "quickLinks": "روابط سريعة",
+  "shop": "المتجر",
+  "collections": "المجموعات",
+  "aboutUs": "معلومات عنا",
+  "contact": "اتصل بنا",
+  "faq": "الأسئلة الشائعة",
+  "customerService": "خدمة العملاء",
+  "shippingInfo": "معلومات الشحن",
+  "returnsExchanges": "الإرجاع والاستبدال",
+  "sizeGuide": "دليل المقاسات",
+  "careInstructions": "تعليمات العناية",
+  "privacyPolicy": "سياسة الخصوصية",
+  "getInTouch": "ابقَ على تواصل",
+  "termsOfService": "شروط الخدمة",
+  "allRightsReserved": "جميع الحقوق محفوظة"
+}
+
 }

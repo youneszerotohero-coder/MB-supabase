@@ -9,13 +9,19 @@ export const getCategories = async () => {
         *,
         parent:categories(*),
         children:categories(*),
-        products:products(count)
+        products(id)
       `)
       .order('name', { ascending: true })
 
     if (error) throw error
 
-    return { data }
+    // Add product count to each category
+    const categoriesWithCount = data.map(category => ({
+      ...category,
+      productCount: category.products?.length || 0
+    }))
+
+    return { data: categoriesWithCount }
   } catch (error) {
     console.error('Error fetching categories:', error)
     throw error

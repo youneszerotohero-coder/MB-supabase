@@ -131,5 +131,23 @@
     "descriptionArabic": "Description (Arabic)",
     "descriptionEnglishPlaceholder": "Enter product description in English",
     "descriptionArabicPlaceholder": "أدخل وصف المنتج باللغة العربية"
+  },
+  "footer": {
+    "description": "Crafting timeless elegance through premium handbags that complement your lifestyle and express your unique style.",
+    "quickLinks": "Quick Links",
+    "shop": "Shop",
+    "collections": "Collections",
+    "aboutUs": "About Us",
+    "contact": "Contact",
+    "faq": "FAQ",
+    "customerService": "Customer Service",
+    "shippingInfo": "Shipping Info",
+    "returnsExchanges": "Returns & Exchanges",
+    "sizeGuide": "Size Guide",
+    "careInstructions": "Care Instructions",
+    "privacyPolicy": "Privacy Policy",
+    "getInTouch": "Get in Touch",
+    "termsOfService": "Terms of Service",
+    "allRightsReserved": "All rights reserved"
   }
 }

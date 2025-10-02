@@ -307,7 +307,7 @@ export default function App() {
               <div className="flex">{renderStars(4)}</div>
               <span>({mainProduct.reviews} reviews)</span>
             </div>
-            <p className="mb-6 text-2xl font-semibold">${Number(mainProduct.price || 0).toFixed(2)}</p>
+            <p className="mb-6 text-2xl font-semibold">{Number(mainProduct.price || 0).toFixed(2)} DZD</p>
 
             {/* Color Selector */}
             {mainProduct.colors && mainProduct.colors.length > 0 && (
@@ -495,7 +495,7 @@ export default function App() {
                       <p className="text-sm text-gray-500">{t('checkout.color')}: {selectedColor}</p>
                       <p className="text-sm text-gray-500">{t('checkout.quantity')}: {quantity}</p>
                       <p className="text-sm font-medium mt-1 text-gray-800">
-                        ${Number(mainProduct.price || 0).toFixed(2)}
+                        {Number(mainProduct.price || 0).toFixed(2)} DZD
                       </p>
                     </div>
                   </div>
@@ -503,15 +503,15 @@ export default function App() {
                   <div className="border-t pt-4 space-y-2 text-sm">
                     <div className="flex justify-between">
                       <span className="text-gray-600">{t('checkout.subtotal')}</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>{subtotal.toFixed(2)} DZD</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-gray-600">{t('checkout.shipping')}</span>
-                      <span>${(shipping / 100).toFixed(2)}</span>
+                      <span>{(shipping / 100).toFixed(2)} DZD</span>
                     </div>
                     <div className="border-t pt-2 flex justify-between font-medium text-gray-800">
                       <span>{t('checkout.total')}</span>
-                      <span>${(total / 100 + subtotal).toFixed(2)}</span>
+                      <span>{(total / 100 + subtotal).toFixed(2)} DZD</span>
                     </div>
                   </div>
 

@@ -13,13 +13,13 @@ import { getOrders, updateOrderStatus } from "@/services/orderService";
 // Mock data removed - now using real API data
 
 const statusConfig = {
-  pending: { label: "Pending", class: "bg-warning-light text-warning" },
-  confirmed: { label: "Confirmed", class: "bg-primary-light text-primary" },
-  processing: { label: "Processing", class: "bg-primary/10 text-primary" },
-  shipped: { label: "Shipped", class: "bg-accent text-accent-foreground" },
-  delivered: { label: "Delivered", class: "bg-success-light text-success" },
-  cancelled: { label: "Cancelled", class: "bg-destructive-light text-destructive" },
-  refunded: { label: "Refunded", class: "bg-muted text-muted-foreground" }
+  pending: { label: "En attente", class: "bg-warning-light text-warning" },
+  confirmed: { label: "Confirmée", class: "bg-primary-light text-primary" },
+  processing: { label: "En traitement", class: "bg-primary/10 text-primary" },
+  shipped: { label: "Expédiée", class: "bg-accent text-accent-foreground" },
+  delivered: { label: "Livrée", class: "bg-success-light text-success" },
+  cancelled: { label: "Annulée", class: "bg-destructive-light text-destructive" },
+  refunded: { label: "Remboursée", class: "bg-muted text-muted-foreground" }
 };
 
 export default function Orders() {
@@ -73,8 +73,8 @@ export default function Orders() {
       console.log('Order created event received:', event.detail);
       queryClient.invalidateQueries({ queryKey: ['admin_orders'] });
       toast({
-        title: "Order List Updated",
-        description: "New order has been added to the list.",
+        title: "Liste des Commandes Mise à Jour",
+        description: "Une nouvelle commande a été ajoutée à la liste.",
       });
     };
 
@@ -133,13 +133,13 @@ export default function Orders() {
       await queryClient.invalidateQueries({ queryKey: ['admin_orders'] });
 
       toast({
-        title: "Success",
-        description: "Order status updated successfully"
+        title: "Succès",
+        description: "Statut de la commande mis à jour avec succès"
       });
     } catch (err) {
       toast({
-        title: "Error",
-        description: err.response?.data?.message || "Failed to update order status",
+        title: "Erreur",
+        description: err.response?.data?.message || "Échec de la mise à jour du statut de la commande",
         variant: "destructive"
       });
     } finally {
@@ -166,9 +166,9 @@ export default function Orders() {
       {/* Header */}
       <div className="flex justify-between items-center">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Orders</h1>
+          <h1 className="text-3xl font-bold text-foreground">Commandes</h1>
           <p className="text-muted-foreground mt-2">
-            Manage and track customer orders
+            Gérez et suivez les commandes clients
             {pagination.totalCount > 0 && (
               <span className="ml-2">
                 ({pagination.totalCount} total)
@@ -177,27 +177,27 @@ export default function Orders() {
           </p>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" onClick={handleRefresh} disabled={loading || isRefreshing}>
-            <RefreshCw className={`w-4 h-4 mr-2 ${loading || isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
+          <Button variant="outline" className="text-white" onClick={handleRefresh} disabled={loading || isRefreshing}>
+            <RefreshCw className={`w-4 h-4 mr-2 text-white ${loading || isRefreshing ? 'animate-spin' : ''}`} />
+            Actualiser
           </Button>
-          <Button variant="outline">
+          {/* <Button variant="outline">
             <Download className="w-4 h-4 mr-2" />
-            Export Orders
-          </Button>
+            Exporter les Commandes
+          </Button> */}
         </div>
       </div>
       {/* Filters */}
       <Card>
         <CardHeader>
-          <CardTitle>Order Filters</CardTitle>
+          <CardTitle>Filtres des Commandes</CardTitle>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSearchSubmit} className="flex flex-col sm:flex-row gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
               <Input
-                placeholder="Search by order number, customer name, phone, or email..."
+                placeholder="Rechercher par numéro de commande, nom du client, téléphone ou email..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10"
@@ -206,26 +206,26 @@ export default function Orders() {
             
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by status" />
+                <SelectValue placeholder="Filtrer par statut" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Statuses</SelectItem>
-                <SelectItem value="pending">Pending</SelectItem>
-                <SelectItem value="confirmed">Confirmed</SelectItem>
-                <SelectItem value="processing">Processing</SelectItem>
-                <SelectItem value="shipped">Shipped</SelectItem>
-                <SelectItem value="delivered">Delivered</SelectItem>
-                <SelectItem value="cancelled">Cancelled</SelectItem>
-                <SelectItem value="refunded">Refunded</SelectItem>
+                <SelectItem value="all">Tous les statuts</SelectItem>
+                <SelectItem value="pending">En attente</SelectItem>
+                <SelectItem value="confirmed">Confirmée</SelectItem>
+                <SelectItem value="processing">En traitement</SelectItem>
+                <SelectItem value="shipped">Expédiée</SelectItem>
+                <SelectItem value="delivered">Livrée</SelectItem>
+                <SelectItem value="cancelled">Annulée</SelectItem>
+                <SelectItem value="refunded">Remboursée</SelectItem>
               </SelectContent>
             </Select>
 
             <Select value={wilayaFilter} onValueChange={setWilayaFilter}>
               <SelectTrigger className="w-full sm:w-48">
-                <SelectValue placeholder="Filter by wilaya" />
+                <SelectValue placeholder="Filtrer par wilaya" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">All Wilayas</SelectItem>
+                <SelectItem value="all">Toutes les wilayas</SelectItem>
                 {uniqueWilayas.map(wilaya => (
                   <SelectItem key={wilaya} value={wilaya}>{wilaya}</SelectItem>
                 ))}
@@ -241,7 +241,7 @@ export default function Orders() {
           {loading && (
             <div className="flex items-center justify-center p-8">
               <RefreshCw className="w-6 h-6 animate-spin mr-2" />
-              <span>Loading orders...</span>
+              <span>Chargement des commandes...</span>
             </div>
           )}
           
@@ -249,7 +249,7 @@ export default function Orders() {
             <div className="text-center p-8">
               <p className="text-destructive mb-4">{error}</p>
               <Button onClick={handleRefresh} variant="outline">
-                Try Again
+                Réessayer
               </Button>
             </div>
           )}
@@ -258,16 +258,16 @@ export default function Orders() {
             <div className="">
               {filteredOrders.length === 0 ? (
                 <div className="text-center p-8">
-                  <p className="text-muted-foreground">No orders found matching your filters.</p>
+                  <p className="text-muted-foreground">Aucune commande trouvée correspondant à vos filtres.</p>
                 </div>
               ) : (
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-border">
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Order Number</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Customer</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Location</th>
-                      <th className="text-left py-4 px-6 font-semibold text-foreground">Status</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">N° Commande</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Client</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Localisation</th>
+                      <th className="text-left py-4 px-6 font-semibold text-foreground">Statut</th>
                       <th className="text-left py-4 px-6 font-semibold text-foreground">Total</th>
                       <th className="text-left py-4 px-6 font-semibold text-foreground">Date</th>
                       <th className="text-left py-4 px-6 font-semibold text-foreground">Actions</th>
@@ -284,7 +284,7 @@ export default function Orders() {
                         <td className="py-4 px-6">
                           <div className="font-medium text-foreground">{order.customer_name}</div>
                           <div className="text-sm text-muted-foreground">
-                            {order.order_items?.length || 0} items
+                            {order.order_items?.length || 0} articles
                           </div>
                           {order.customer_phone && (
                             <div className="text-sm text-muted-foreground">
@@ -320,16 +320,16 @@ export default function Orders() {
                               disabled={statusUpdating === order.id}
                             >
                               <SelectTrigger className="w-32 h-8">
-                                <SelectValue placeholder="Update" />
+                                <SelectValue placeholder="Mettre à jour" />
                               </SelectTrigger>
                               <SelectContent>
-                                <SelectItem value="pending">Pending</SelectItem>
-                                <SelectItem value="confirmed">Confirmed</SelectItem>
-                                <SelectItem value="processing">Processing</SelectItem>
-                                <SelectItem value="shipped">Shipped</SelectItem>
-                                <SelectItem value="delivered">Delivered</SelectItem>
-                                <SelectItem value="cancelled">Cancelled</SelectItem>
-                                <SelectItem value="refunded">Refunded</SelectItem>
+                                <SelectItem value="pending">En attente</SelectItem>
+                                <SelectItem value="confirmed">Confirmée</SelectItem>
+                                <SelectItem value="processing">En traitement</SelectItem>
+                                <SelectItem value="shipped">Expédiée</SelectItem>
+                                <SelectItem value="delivered">Livrée</SelectItem>
+                                <SelectItem value="cancelled">Annulée</SelectItem>
+                                <SelectItem value="refunded">Remboursée</SelectItem>
                               </SelectContent>
                             </Select>
                           </div>

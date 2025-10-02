@@ -151,7 +151,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm pl-6">
                 <div className="flex items-center gap-2">
                   <Calendar className="w-4 h-4 text-muted-foreground" />
                   <div>
@@ -193,7 +193,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pl-6">
                 <div>
                   <p className="text-sm text-muted-foreground">Customer Name</p>
                   <p className="font-medium">{order.customer_name}</p>
@@ -233,7 +233,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
               <CardTitle>Ordered Products</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
+              <div className="space-y-4 px-6">
                 {order.order_items?.map((item, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex-1">
@@ -273,7 +273,7 @@ export default function OrderViewDialog({ orderId, open, onOpenChange }) {
               <Separator className="my-4" />
 
               {/* Order Totals */}
-              <div className="space-y-2">
+              <div className="space-y-2 px-6">
                 <div className="flex justify-between">
                   <span className="text-muted-foreground">Subtotal</span>
                   <span className="font-medium">{formatPrice(order.subtotal)}</span>
