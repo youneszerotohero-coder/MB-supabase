@@ -1,6 +1,9 @@
 import { motion } from "framer-motion";
 import {Star} from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { getFeaturedProducts } from "@/services/productService";
+import { getProductImageUrl } from "@/utils/imageUtils";
 import heroImage from "../../../public/images/heroImage.jpg";
 import ProductCard from "../../components/productCard";
 import { useScrollAnimation } from "../../hooks/useScrollAnimation";
@@ -84,6 +87,15 @@ const TESTIMONIALS = [
 export default function MouadBoutiqueLanding() {
   const { t } = useTranslation();
   const { isRTL } = useLanguage();
+
+  // Fetch featured products for Bestsellers section
+  const { data: featuredProductsData, isLoading: isLoadingFeatured, isError: isFeaturedError } = useQuery({
+    queryKey: ["featured-products", 4],
+    queryFn: async () => {
+      const res = await getFeaturedProducts(4);
+      return res.data || [];
+    }
+  });
 
   return (
     <div className={`mt-10 min-h-screen bg-white text-neutral-900 ${isRTL ? 'rtl' : 'ltr'}`}>
@@ -174,15 +186,22 @@ export default function MouadBoutiqueLanding() {
             <p className="mt-3 text-neutral-600">{t('home.bestsellersDescription')}</p>
           </motion.div>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {PRODUCTS.map((p, i) => (
+            {(isLoadingFeatured || isFeaturedError ? PRODUCTS : featuredProductsData).map((p, i) => (
               <motion.div
-                key={p.id}
+                key={p.id || p.name}
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: i * 0.1 }}
               >
-                <ProductCard image={p.image} name={p.name} price={p.price} />
+                <ProductCard
+                  id={p.id}
+                  image={p.image ? p.image : getProductImageUrl(p)}
+                  name={p.name}
+                  price={p.price}
+                  compareAtPrice={p.compare_at_price || p.compareAtPrice}
+                  sizes={p.sizes}
+                />
               </motion.div>
             ))}
           </div>

@@ -26,20 +26,20 @@ export const analyticsService = {
 
       let query = supabase
         .from('dashboard_summary')
-        .select('revenue, profit, campaign_spend, stock_value, online_revenue, online_profit, instore_revenue, instore_profit')
+        .select('period, revenue, profit, campaign_spend, stock_value, online_revenue, online_profit, instore_revenue, instore_profit')
         .gte('period', startDate.toISOString())
-        .lte('period', endDate.toISOString());
+        .lte('period', endDate.toISOString())
+        .order('period', { ascending: true });
 
       const { data, error } = await query;
 
       if (error) throw error;
 
-      // Aggregate the data
-      const stats = (data || []).reduce((acc, item) => ({
+      // Aggregate the data for sums; stock value should be point-in-time (latest period)
+      const baseAgg = (data || []).reduce((acc, item) => ({
         revenue: acc.revenue + parseFloat(item.revenue || 0),
         netProfit: acc.netProfit + parseFloat(item.profit || 0),
         campaignSpend: acc.campaignSpend + parseFloat(item.campaign_spend || 0),
-        stockValue: acc.stockValue + parseFloat(item.stock_value || 0),
         onlineRevenue: acc.onlineRevenue + parseFloat(item.online_revenue || 0),
         onlineProfit: acc.onlineProfit + parseFloat(item.online_profit || 0),
         instoreRevenue: acc.instoreRevenue + parseFloat(item.instore_revenue || 0),
@@ -48,13 +48,21 @@ export const analyticsService = {
         revenue: 0,
         netProfit: 0,
         campaignSpend: 0,
-        stockValue: 0,
         onlineRevenue: 0,
         onlineProfit: 0,
         instoreRevenue: 0,
-        instoreProfit: 0,
-        ordersCount: 0
+        instoreProfit: 0
       });
+
+      const latestStockValue = (data && data.length > 0)
+        ? parseFloat(data[data.length - 1].stock_value || 0)
+        : 0;
+
+      const stats = {
+        ...baseAgg,
+        stockValue: latestStockValue,
+        ordersCount: 0
+      };
 
       // Get orders count for the same period
       const { count: ordersCount } = await supabase

@@ -3,6 +3,10 @@ import {ShoppingBag} from "lucide-react";
 import { Link } from 'react-router-dom';
 
 export default function ProductCard(props) {
+  const currentPrice = Number(props.price || 0)
+  const compareAtPrice = props.compareAtPrice != null ? Number(props.compareAtPrice) : null
+  const showCompare = compareAtPrice && compareAtPrice > 0 && compareAtPrice > currentPrice
+  const discountPercent = showCompare ? Math.round((1 - (currentPrice / compareAtPrice)) * 100) : null
   return (
                 <Card className="overflow-hidden rounded-3xl shadow-md group">
                   {/* Product Image */}
@@ -14,9 +18,11 @@ export default function ProductCard(props) {
                         className="h-56 w-full object-cover transition-transform duration-500 group-hover:scale-105"
                       />
                     </Link>
-                    <span className="absolute top-4 left-4 bg-white/90 text-xs font-medium text-[#C8B28D] px-1 py-2 rounded-full shadow">
-                      50%
-                    </span>
+                    {showCompare && (
+                      <span className="absolute top-4 left-4 bg-white/90 text-xs font-medium text-[#C8B28D] px-1 py-2 rounded-full shadow">
+                        -{discountPercent}%
+                      </span>
+                    )}
                   </div>
 
                   {/* Content */}
@@ -26,9 +32,16 @@ export default function ProductCard(props) {
                         <p className="font-serif font-semibold text-white">
                           {props.name}
                         </p>
-                        <p className="text-base font-medium text-white">
-                          {Number(props.price || 0).toFixed(2)} DZD
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="text-base font-semibold text-white">
+                            {currentPrice.toFixed(2)} DZD
+                          </p>
+                          {showCompare && (
+                            <p className="text-sm font-normal text-white/80 line-through">
+                              {compareAtPrice.toFixed(2)} DZD
+                            </p>
+                          )}
+                        </div>
                       </div>
                       <button className="h-10 rounded-[2px] bg-white text-[#C8B28D] rounded-full px-2">
                         <ShoppingBag className="h-6 w-6" />

@@ -39,11 +39,9 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
   const { isRTL } = useLanguage();
   
   const { data, isLoading, isError, error, refetch } = useQuery({
-    queryKey: ['products', { ...appliedFilters, page: currentPage }],
+    queryKey: ['products', { ...appliedFilters }],
     queryFn: async () => {
       const params = {
-        page: currentPage,
-        limit: 12,
         sortBy: 'createdAt',
         sortOrder: 'desc'
       }
@@ -80,8 +78,37 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
       })
       
       const res = await getProducts(params)
-      console.log('Products response:', res)
-      return res.data.products
+      let products = res.data.products || []
+
+      // Client-side filtering for sizes and colors (backend does not filter these)
+      const normalizeSize = (size) => {
+        if (typeof size === 'string') return size.toLowerCase()
+        if (size && (size.value || size.size)) return String(size.value || size.size).toLowerCase()
+        return ''
+      }
+      const normalizeColor = (color) => {
+        if (typeof color === 'string') return color.toLowerCase()
+        if (color && (color.name || color.value)) return String(color.name || color.value).toLowerCase()
+        return ''
+      }
+
+      if (appliedFilters.selectedSizes && appliedFilters.selectedSizes.length > 0) {
+        const selectedSizes = appliedFilters.selectedSizes.map(s => String(s).toLowerCase())
+        products = products.filter(p => {
+          const pSizes = Array.isArray(p.sizes) ? p.sizes : []
+          return pSizes.some(sz => selectedSizes.includes(normalizeSize(sz)))
+        })
+      }
+
+      if (appliedFilters.selectedColors && appliedFilters.selectedColors.length > 0) {
+        const selectedColors = appliedFilters.selectedColors.map(c => String(c).toLowerCase())
+        products = products.filter(p => {
+          const pColors = Array.isArray(p.colors) ? p.colors : []
+          return pColors.some(clr => selectedColors.includes(normalizeColor(clr)))
+        })
+      }
+
+      return products
     }
   })
 
@@ -108,7 +135,12 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
 
   console.log('Products data:', data)
   const products = data || []
-  const pagination = {} // We'll handle pagination later
+  const pageSize = 12
+  const totalPages = Math.max(1, Math.ceil(products.length / pageSize))
+  const safeCurrentPage = Math.min(Math.max(1, currentPage), totalPages)
+  const startIndex = (safeCurrentPage - 1) * pageSize
+  const endIndex = startIndex + pageSize
+  const pageItems = products.slice(startIndex, endIndex)
 
   if (products.length === 0) {
     return (
@@ -127,57 +159,58 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6 mb-8">
-        {products.map((product) => (
+        {pageItems.map((product) => (
           <ProductCard
             key={product.id}
             id={product.id}
             name={product.name || 'Unnamed Product'}
             image={getProductImageUrl(product)}
             price={Number(product.price || product.finalPrice || 0)}
+            compareAtPrice={product.compare_at_price || product.compareAtPrice}
             sizes={product.sizes || []}
             colors={product.colors || []}
           />
         ))}
       </div>
       
-      {pagination.totalPages > 1 && (
+      {totalPages > 1 && (
         <div className="flex justify-center items-center gap-1 sm:gap-2 flex-wrap">
           <Button 
             variant="outline" 
             size="sm" 
-            disabled={currentPage <= 1}
-            onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
+            disabled={safeCurrentPage <= 1}
+            onClick={() => setCurrentPage(Math.max(1, safeCurrentPage - 1))}
             className="hidden sm:flex bg-transparent"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
           
-          {[...Array(Math.min(5, pagination.totalPages))].map((_, i) => {
-            const pageNum = Math.max(1, Math.min(pagination.totalPages - 4, currentPage - 2)) + i
-            if (pageNum > pagination.totalPages) return null
+          {[...Array(Math.min(5, totalPages))].map((_, i) => {
+            const pageNum = Math.max(1, Math.min(totalPages - 4, safeCurrentPage - 2)) + i
+            if (pageNum > totalPages) return null
             return (
               <Button
                 key={pageNum}
-                variant={currentPage === pageNum ? "default" : "outline"}
+                variant={safeCurrentPage === pageNum ? "default" : "outline"}
                 size="sm"
                 onClick={() => setCurrentPage(pageNum)}
-                className={currentPage === pageNum ? "bg-[#C8B28D] text-white hover:bg-[#b49e77]" : ""}
+                className={safeCurrentPage === pageNum ? "bg-[#C8B28D] text-white hover:bg-[#b49e77]" : ""}
               >
                 {pageNum}
               </Button>
             )
           })}
           
-          {pagination.totalPages > 5 && currentPage < pagination.totalPages - 2 && (
+          {totalPages > 5 && safeCurrentPage < totalPages - 2 && (
             <>
               <span className="px-2 hidden sm:inline">...</span>
               <Button 
                 variant="outline" 
                 size="sm" 
-                onClick={() => setCurrentPage(pagination.totalPages)}
+                onClick={() => setCurrentPage(totalPages)}
                 className="hidden sm:inline-flex"
               >
-                {pagination.totalPages}
+                {totalPages}
               </Button>
             </>
           )}
@@ -185,8 +218,8 @@ function ProductsGrid({ appliedFilters, currentPage, setCurrentPage }) {
           <Button 
             variant="outline" 
             size="sm" 
-            disabled={currentPage >= pagination.totalPages}
-            onClick={() => setCurrentPage(Math.min(pagination.totalPages, currentPage + 1))}
+            disabled={safeCurrentPage >= totalPages}
+            onClick={() => setCurrentPage(Math.min(totalPages, safeCurrentPage + 1))}
             className="hidden sm:flex bg-transparent"
           >
             <ChevronRight className="h-4 w-4" />

@@ -68,9 +68,9 @@ export default function Dashboard() {
   // Get days based on period
   const getDaysForPeriod = (period) => {
     switch (period) {
-      case 'daily': return 30;
-      case 'weekly': return 84; // ~12 weeks
-      case 'monthly': return 365; // 12 months
+      case 'daily': return 1; // last 1 day
+      case 'weekly': return 7; // last 7 days
+      case 'monthly': return 30; // last 30 days
       default: return 30;
     }
   };

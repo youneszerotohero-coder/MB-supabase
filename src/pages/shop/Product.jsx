@@ -88,6 +88,9 @@ export default function App() {
 
   // Calculate pricing
   const productPrice = Number(mainProduct.price || 0)
+  const compareAtPrice = mainProduct.compare_at_price != null ? Number(mainProduct.compare_at_price) : (mainProduct.compareAtPrice != null ? Number(mainProduct.compareAtPrice) : null)
+  const showCompare = compareAtPrice && compareAtPrice > 0 && compareAtPrice > productPrice
+  const discountPercent = showCompare ? Math.round((1 - (productPrice / compareAtPrice)) * 100) : null
   const subtotal = productPrice * quantity;
   const shipping = subtotal > 0 ? 600 : 0; // example shipping
   const total = subtotal + shipping;
@@ -307,7 +310,15 @@ export default function App() {
               <div className="flex">{renderStars(4)}</div>
               <span>({mainProduct.reviews} reviews)</span>
             </div>
-            <p className="mb-6 text-2xl font-semibold">{Number(mainProduct.price || 0).toFixed(2)} DZD</p>
+            <div className="mb-6 flex items-center gap-3">
+              <p className="text-2xl font-semibold">{productPrice.toFixed(2)} DZD</p>
+              {showCompare && (
+                <>
+                  <p className="text-lg text-gray-500 line-through">{compareAtPrice.toFixed(2)} DZD</p>
+                  <span className="text-sm font-medium text-green-600">-{discountPercent}%</span>
+                </>
+              )}
+            </div>
 
             {/* Color Selector */}
             {mainProduct.colors && mainProduct.colors.length > 0 && (
@@ -494,9 +505,12 @@ export default function App() {
                       <h4 className="text-sm font-medium">{mainProduct.name}</h4>
                       <p className="text-sm text-gray-500">{t('checkout.color')}: {selectedColor}</p>
                       <p className="text-sm text-gray-500">{t('checkout.quantity')}: {quantity}</p>
-                      <p className="text-sm font-medium mt-1 text-gray-800">
-                        {Number(mainProduct.price || 0).toFixed(2)} DZD
-                      </p>
+                      <div className="text-sm font-medium mt-1 text-gray-800 flex items-center gap-2">
+                        <span>{productPrice.toFixed(2)} DZD</span>
+                        {showCompare && (
+                          <span className="text-gray-500 line-through">{compareAtPrice.toFixed(2)} DZD</span>
+                        )}
+                      </div>
                     </div>
                   </div>
 
@@ -549,6 +563,7 @@ export default function App() {
                   name={product.name || 'Unnamed Product'}
                   image={getProductImageUrl(product)}
                   price={Number(product.price || product.finalPrice || 0)}
+                  compareAtPrice={product.compare_at_price || product.compareAtPrice}
                 />
               ))}
             </div>
